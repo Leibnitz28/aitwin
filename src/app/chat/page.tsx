@@ -62,7 +62,7 @@ export default function ChatPage() {
     };
 
     return (
-        <div className="h-[calc(100vh-64px)] flex flex-col px-4 py-4">
+        <div className="h-[calc(100dvh-64px)] flex flex-col px-4 py-4">
             <div className="max-w-4xl mx-auto w-full flex flex-col h-full">
                 {/* Header */}
                 <motion.div

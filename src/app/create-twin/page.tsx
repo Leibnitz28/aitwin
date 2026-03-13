@@ -64,25 +64,25 @@ export default function CreateTwinPage() {
                 </motion.div>
 
                 {/* Step Indicator */}
-                <div className="flex items-center justify-center gap-2 mb-12">
+                <div className="flex items-center justify-center gap-1 sm:gap-2 mb-12 overflow-x-auto pb-4">
                     {steps.map((step, i) => (
-                        <div key={step.id} className="flex items-center">
+                        <div key={step.id} className="flex items-center shrink-0">
                             <motion.div
                                 animate={{
                                     scale: currentStep === step.id ? 1.1 : 1,
                                 }}
-                                className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all ${currentStep > step.id
+                                className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-xs sm:text-sm font-bold transition-all ${currentStep > step.id
                                     ? 'bg-emerald-500 text-white'
                                     : currentStep === step.id
                                         ? 'bg-gradient-to-r from-cyan-500 to-purple-600 text-white shadow-[0_0_20px_rgba(0,245,255,0.3)]'
                                         : 'glass text-gray-500'
                                     }`}
                             >
-                                {currentStep > step.id ? <CheckCircle2 className="w-5 h-5" /> : step.id}
+                                {currentStep > step.id ? <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5" /> : step.id}
                             </motion.div>
                             {i < steps.length - 1 && (
                                 <div
-                                    className={`w-12 sm:w-20 h-0.5 mx-1 transition-colors ${currentStep > step.id ? 'bg-emerald-500' : 'bg-white/10'
+                                    className={`w-6 sm:w-12 md:w-20 h-0.5 mx-1 transition-colors ${currentStep > step.id ? 'bg-emerald-500' : 'bg-white/10'
                                         }`}
                                 />
                             )}
