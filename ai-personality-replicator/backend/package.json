@@ -1,0 +1,27 @@
+{
+  "name": "ai-personality-replicator-backend",
+  "version": "1.0.0",
+  "description": "Backend server for AI Personality Replicator project",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "keywords": [
+    "ai",
+    "personality-replicator",
+    "express",
+    "mongodb"
+  ],
+  "author": "Prince",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.6.1",
+    "express": "^4.19.2",
+    "mongoose": "^9.3.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  }
+}

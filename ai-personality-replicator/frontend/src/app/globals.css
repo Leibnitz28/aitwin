@@ -1,0 +1,113 @@
+@import "tailwindcss";
+
+:root {
+  --neon-cyan: #00f5ff;
+  --neon-purple: #8b5cf6;
+  --neon-pink: #ec4899;
+  --neon-blue: #3b82f6;
+  --neon-green: #10b981;
+  --dark-bg: #0a0a1a;
+  --dark-card: rgba(15, 15, 35, 0.6);
+  --glass-border: rgba(255, 255, 255, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--dark-bg);
+  color: #e2e8f0;
+  font-family: 'Inter', 'Segoe UI', -apple-system, sans-serif;
+  overflow-x: hidden;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #0a0a1a; }
+::-webkit-scrollbar-thumb { background: #8b5cf620; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #8b5cf640; }
+
+/* Glassmorphism */
+.glass {
+  background: rgba(15, 15, 35, 0.6);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+}
+
+.glass-strong {
+  background: rgba(15, 15, 35, 0.8);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+}
+
+/* Neon Glow */
+.neon-glow {
+  box-shadow: 0 0 15px rgba(0, 245, 255, 0.15),
+              0 0 40px rgba(139, 92, 246, 0.08);
+}
+
+.neon-text {
+  text-shadow: 0 0 10px rgba(0, 245, 255, 0.5),
+               0 0 30px rgba(0, 245, 255, 0.2);
+}
+
+/* Gradients */
+.gradient-text {
+  background: linear-gradient(135deg, #00f5ff, #8b5cf6, #ec4899);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-border {
+  position: relative;
+}
+.gradient-border::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, #00f5ff40, #8b5cf640, #ec489940);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  -webkit-mask-composite: xor;
+  pointer-events: none;
+}
+
+/* Animated pulse rings */
+@keyframes pulse-ring {
+  0% { transform: scale(0.8); opacity: 1; }
+  100% { transform: scale(2.5); opacity: 0; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.animate-float { animation: float 6s ease-in-out infinite; }
+.animate-shimmer {
+  background-size: 200% 100%;
+  animation: shimmer 3s linear infinite;
+}
+
+/* Neural line animation */
+@keyframes neural-pulse {
+  0%, 100% { opacity: 0.1; }
+  50% { opacity: 0.6; }
+}
