@@ -71,9 +71,10 @@ function FloatingConnections() {
             {lines.map((line, i) => {
                 const geometry = new THREE.BufferGeometry().setFromPoints([line.start, line.end]);
                 return (
-                    <line key={i} geometry={geometry}>
-                        <lineBasicMaterial color="#8b5cf6" transparent opacity={0.08} />
-                    </line>
+                    <primitive
+                        key={i}
+                        object={new THREE.Line(geometry, new THREE.LineBasicMaterial({ color: '#8b5cf6', transparent: true, opacity: 0.08 }))}
+                    />
                 );
             })}
         </group>
