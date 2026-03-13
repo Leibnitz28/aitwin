@@ -81,7 +81,7 @@ export default function LandingPage() {
           >
             <span className="text-white">Create Your</span>
             <br />
-            <span className="gradient-text">EchoSoul Replica</span>
+            <span className="gradient-text">EchoSoul</span>
           </motion.h1>
 
           {/* 3D Brain */}
