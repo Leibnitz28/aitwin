@@ -69,7 +69,7 @@ export default function LandingPage() {
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass mb-6"
           >
             <Sparkles className="w-4 h-4 text-cyan-400" />
-            <span className="text-sm text-gray-300">Powered by IQ AI Multi-Agent System</span>
+            <span className="text-sm text-gray-300">Powered by EchoSoul Multi-Agent System</span>
           </motion.div>
 
           {/* Title */}
@@ -81,7 +81,7 @@ export default function LandingPage() {
           >
             <span className="text-white">Create Your</span>
             <br />
-            <span className="gradient-text">AI Personality Twin</span>
+            <span className="gradient-text">EchoSoul Replica</span>
           </motion.h1>
 
           {/* 3D Brain */}
@@ -100,8 +100,8 @@ export default function LandingPage() {
             transition={{ duration: 0.6, delay: 0.5 }}
             className="text-lg sm:text-xl text-gray-400 max-w-2xl mx-auto mb-10"
           >
-            Upload your voice and writing samples. Our AI agents analyze, replicate, and deploy
-            your personality as a blockchain-verified digital twin.
+            Upload your voice and writing samples. Our agents analyze, replicate, and deploy
+            your personality as a blockchain-verified EchoSoul replica.
           </motion.p>
 
           {/* CTA Buttons */}
@@ -268,10 +268,10 @@ export default function LandingPage() {
           className="max-w-3xl mx-auto text-center glass-strong p-12 neon-glow"
         >
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-            Ready to Create Your Twin?
+            Ready to Create Your EchoSoul?
           </h2>
           <p className="text-gray-400 mb-8 max-w-lg mx-auto">
-            Join the future of digital identity. Your AI twin is waiting to be born.
+            Join the future of digital identity. Your EchoSoul is waiting to be born.
           </p>
           <Link href="/create-twin">
             <button className="px-10 py-4 rounded-2xl bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-bold text-lg hover:shadow-[0_0_40px_rgba(0,245,255,0.3)] transition-all hover:scale-105">
@@ -284,7 +284,7 @@ export default function LandingPage() {
       {/* Footer */}
       <footer className="py-10 px-4 border-t border-white/5">
         <div className="max-w-6xl mx-auto text-center text-gray-600 text-sm">
-          © 2024 AI Personality Twin. Built with IQ AI, ElevenLabs, Ethereum, Google Cloud & Snowflake.
+          © 2026 EchoSoul. Built with EchoSoul agents, ElevenLabs, Ethereum, Google Cloud & Snowflake.
         </div>
       </footer>
     </div>

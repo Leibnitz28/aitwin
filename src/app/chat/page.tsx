@@ -15,7 +15,7 @@ const aiResponses = [
     "That's a really insightful question. Based on what I've learned from your personality patterns, I'd approach this with a blend of analytical thinking and creative problem-solving, which is very characteristic of your communication style.",
     "Interesting! Your writing patterns suggest you value directness, so I'll be straightforward — I think this is a great idea. The personality analysis showed your openness score is 87%, which aligns perfectly with this kind of exploratory thinking.",
     "I've noticed from your samples that you tend to think about problems from multiple angles. Let me reflect that: there are at least three ways to look at this, and I think each has its merits based on your typical decision-making framework.",
-    "Your AI twin here! Based on my deep analysis of your personality traits, I'd say you're more likely to take the creative approach here. Your conscientiousness is high (72%), so you'll also want a solid plan before diving in.",
+    "Your EchoSoul replica here! Based on my deep analysis of your personality traits, I'd say you're more likely to take the creative approach here. Your conscientiousness is high (72%), so you'll also want a solid plan before diving in.",
     "That resonates with your core personality traits. The memory agent has noted similar patterns in 14 previous conversations. You consistently lean toward innovative solutions while maintaining practical boundaries.",
 ];
 
@@ -24,7 +24,7 @@ export default function ChatPage() {
         {
             id: 1,
             sender: 'ai',
-            text: 'Hello! I\'m your AI Personality Twin. I\'ve been trained on your voice and writing samples to replicate your unique communication style. How can I help you today?',
+            text: 'Hello! I\'m EchoSoul, your digital persona replica. I\'ve been trained on your voice and writing samples to replicate your unique communication style. How can I help you today?',
             timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         },
     ]);
@@ -74,10 +74,10 @@ export default function ChatPage() {
                         <Bot className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                        <h2 className="text-white font-bold">Prince&apos;s AI Twin</h2>
+                        <h2 className="text-white font-bold">Prince&apos;s EchoSoul</h2>
                         <div className="flex items-center gap-2">
                             <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                            <span className="text-xs text-gray-400">Online • 5 agents active</span>
+                            <span className="text-xs text-gray-400">Online • Persona Sync Active</span>
                         </div>
                     </div>
                     <div className="ml-auto flex items-center gap-1">
@@ -98,8 +98,8 @@ export default function ChatPage() {
                             <div className={`max-w-[80%] flex gap-3 ${msg.sender === 'user' ? 'flex-row-reverse' : ''}`}>
                                 <div
                                     className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${msg.sender === 'user'
-                                            ? 'bg-gradient-to-br from-blue-500 to-purple-600'
-                                            : 'bg-gradient-to-br from-cyan-400 to-emerald-500'
+                                        ? 'bg-gradient-to-br from-blue-500 to-purple-600'
+                                        : 'bg-gradient-to-br from-cyan-400 to-emerald-500'
                                         }`}
                                 >
                                     {msg.sender === 'user' ? <User className="w-4 h-4 text-white" /> : <Bot className="w-4 h-4 text-white" />}
@@ -107,8 +107,8 @@ export default function ChatPage() {
                                 <div>
                                     <div
                                         className={`px-4 py-3 rounded-2xl text-sm leading-relaxed ${msg.sender === 'user'
-                                                ? 'bg-gradient-to-r from-blue-600/40 to-purple-600/40 text-white rounded-tr-md'
-                                                : 'glass text-gray-200 rounded-tl-md'
+                                            ? 'bg-gradient-to-r from-blue-600/40 to-purple-600/40 text-white rounded-tr-md'
+                                            : 'glass text-gray-200 rounded-tl-md'
                                             }`}
                                     >
                                         {msg.text}

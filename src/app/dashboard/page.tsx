@@ -19,9 +19,9 @@ export default function DashboardPage() {
                     className="mb-12"
                 >
                     <h1 className="text-4xl sm:text-5xl font-bold mb-3">
-                        <span className="gradient-text">Twin Dashboard</span>
+                        <span className="gradient-text">EchoSoul Dashboard</span>
                     </h1>
-                    <p className="text-gray-400 text-lg">Manage and interact with your AI personality twin</p>
+                    <p className="text-gray-400 text-lg">Manage and interact with your digital replica</p>
                 </motion.div>
 
                 {/* 3D Orb */}
@@ -34,7 +34,7 @@ export default function DashboardPage() {
                             PT
                         </div>
                         <div className="flex-1">
-                            <h2 className="text-2xl font-bold text-white mb-1">Prince&apos;s AI Twin</h2>
+                            <h2 className="text-2xl font-bold text-white mb-1">Prince&apos;s EchoSoul</h2>
                             <p className="text-gray-400 mb-3">Created March 13, 2026 • Last active 2 minutes ago</p>
                             <div className="flex flex-wrap gap-2">
                                 <span className="px-3 py-1 rounded-full text-xs font-medium bg-emerald-400/10 text-emerald-400">

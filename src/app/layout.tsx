@@ -3,8 +3,8 @@ import "./globals.css";
 import ClientLayout from "./components/ClientLayout";
 
 export const metadata: Metadata = {
-  title: "AI Personality Twin | Create Your Digital AI Twin",
-  description: "Build your AI digital twin using voice cloning, personality analysis, and blockchain identity verification. Powered by IQ AI agents, ElevenLabs, and Ethereum.",
+  title: "EchoSoul | Create Your Digital AI Twin",
+  description: "Build your AI digital twin using voice cloning, personality analysis, and blockchain identity verification. Powered by EchoSoul agents, ElevenLabs, and Ethereum.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

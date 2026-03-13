@@ -35,7 +35,7 @@ export default function Navbar() {
                         <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-cyan-400 to-purple-500 flex items-center justify-center group-hover:shadow-[0_0_20px_rgba(0,245,255,0.4)] transition-shadow">
                             <Brain className="w-5 h-5 text-white" />
                         </div>
-                        <span className="text-lg font-bold gradient-text hidden sm:block">AI Twin</span>
+                        <span className="text-lg font-bold gradient-text hidden sm:block">EchoSoul</span>
                     </Link>
 
                     {/* Desktop Nav */}
@@ -45,8 +45,8 @@ export default function Navbar() {
                                 key={link.href}
                                 href={link.href}
                                 className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${pathname === link.href
-                                        ? 'text-cyan-400 bg-cyan-400/10'
-                                        : 'text-gray-400 hover:text-white hover:bg-white/5'
+                                    ? 'text-cyan-400 bg-cyan-400/10'
+                                    : 'text-gray-400 hover:text-white hover:bg-white/5'
                                     }`}
                             >
                                 {link.label}
@@ -85,8 +85,8 @@ export default function Navbar() {
                                 href={link.href}
                                 onClick={() => setMobileOpen(false)}
                                 className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${pathname === link.href
-                                        ? 'text-cyan-400 bg-cyan-400/10'
-                                        : 'text-gray-400 hover:text-white hover:bg-white/5'
+                                    ? 'text-cyan-400 bg-cyan-400/10'
+                                    : 'text-gray-400 hover:text-white hover:bg-white/5'
                                     }`}
                             >
                                 {link.label}
