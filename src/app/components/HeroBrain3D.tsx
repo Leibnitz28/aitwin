@@ -23,40 +23,6 @@ function isInsideBrain(p: THREE.Vector3) {
     return true;
 }
 
-function NeuralCore() {
-    const coreRef = useRef<THREE.Mesh>(null!);
-    const glowRef = useRef<THREE.Mesh>(null!);
-
-    useFrame((state) => {
-        const t = state.clock.elapsedTime;
-        const pulse = 1 + Math.sin(t * 3) * 0.05;
-        if (coreRef.current) coreRef.current.scale.setScalar(pulse);
-        if (glowRef.current) {
-            glowRef.current.scale.setScalar(pulse * 1.5);
-            (glowRef.current.material as THREE.MeshBasicMaterial).opacity = 0.5 + Math.sin(t * 8) * 0.2;
-        }
-    });
-
-    return (
-        <group>
-            {/* Bright solid core */}
-            <mesh ref={coreRef}>
-                <sphereGeometry args={[0.2, 32, 32]} />
-                <meshBasicMaterial color="#ffffff" />
-            </mesh>
-            {/* Intense cyan glow around core */}
-            <mesh ref={glowRef}>
-                <sphereGeometry args={[0.3, 32, 32]} />
-                <meshBasicMaterial color="#a5f3fc" transparent opacity={0.6} blending={THREE.AdditiveBlending} depthWrite={false} />
-            </mesh>
-            <mesh>
-                <sphereGeometry args={[0.6, 32, 32]} />
-                <meshBasicMaterial color="#0891b2" transparent opacity={0.15} blending={THREE.AdditiveBlending} depthWrite={false} />
-            </mesh>
-        </group>
-    );
-}
-
 // Jagged white lightning/neural paths exploding out of the center
 function MajorNeuralPathways() {
     const groupRef = useRef<THREE.Group>(null!);
@@ -259,9 +225,6 @@ export default function HeroBrain3D() {
                 {/* Dark atmospheric lighting */}
                 <ambientLight intensity={0.2} />
                 <pointLight position={[0, 0, 0]} intensity={2} color="#22d3ee" distance={8} />
-
-                {/* Bright central orb */}
-                <NeuralCore />
 
                 {/* Brain-shaped plexus network */}
                 <BrainPlexusWeb />
