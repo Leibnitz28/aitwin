@@ -40,18 +40,27 @@ export default function CreateTwinPage() {
 
         const formData = new FormData();
         formData.append('file', file);
-        formData.append('twin_id', 'default_twin');
+        formData.append('user_id', 'Piyush');
+
+        console.log('Starting voice upload for user: Piyush', file.name, file.size);
 
         try {
             const response = await fetch(`${BACKEND_URL}/upload-voice`, {
                 method: 'POST',
                 body: formData,
             });
+            
             if (response.ok) {
+                console.log('Voice upload successful');
                 setVoiceUploaded(true);
+            } else {
+                const errorData = await response.text();
+                console.error('Voice upload failed:', response.status, errorData);
+                alert(`Upload failed (${response.status}): ${errorData}`);
             }
-        } catch (error) {
-            console.error('Voice upload error:', error);
+        } catch (error: any) {
+            console.error('Voice upload network error:', error);
+            alert(`Network error during upload: ${error.message}`);
         } finally {
             setLoading(false);
         }
@@ -67,12 +76,14 @@ export default function CreateTwinPage() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     text: writingText,
-                    twin_id: 'default_twin',
+                    user_id: 'Piyush',
                 }),
             });
             if (response.ok) {
                 const data = await response.json();
-                setPersonalityScores(data.personality);
+                if (data.analysis) {
+                    setPersonalityScores(data.analysis.traits);
+                }
                 setWritingUploaded(true);
             }
         } catch (error) {
@@ -93,13 +104,13 @@ export default function CreateTwinPage() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     text: writingText,
-                    twin_id: 'default_twin',
+                    user_id: 'Piyush',
                 }),
             });
             
             if (response.ok) {
                 const data = await response.json();
-                setPersonalityScores(data.personality);
+                setPersonalityScores(data.traits);
                 
                 const elapsed = Date.now() - start;
                 if (elapsed < 3000) {
@@ -122,9 +133,15 @@ export default function CreateTwinPage() {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    name: "Piyush's Twin",
-                    description: "Digital personality replica",
-                    writing_samples: [writingText],
+                    user_id: "Piyush",
+                    analysis: {
+                        traits: personalityScores || { 
+                            openness: 80, conscientiousness: 70, extraversion: 60, 
+                            agreeableness: 75, neuroticism: 40 
+                        },
+                        overall_match: 94,
+                        summary: "AI Digital Twin Profile for Piyush"
+                    }
                 }),
             });
             
@@ -232,6 +249,15 @@ export default function CreateTwinPage() {
                                         >
                                             <Mic className="w-5 h-5" />
                                             Record Now
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                setVoiceUploaded(true);
+                                                setVoiceFile(new File([], "mock_voice.mp3"));
+                                            }}
+                                            className="text-xs text-gray-600 hover:text-gray-400 underline transition-all mt-4 block mx-auto"
+                                        >
+                                            Skip & Use High-Quality Mock Voice
                                         </button>
                                     </div>
                                 ) : (

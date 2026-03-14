@@ -7,3 +7,4 @@ httpx
 web3
 snowflake-connector-python
 google-cloud-storage
+openai

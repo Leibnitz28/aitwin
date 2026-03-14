@@ -33,8 +33,8 @@ export default function BlockchainPage() {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    twin_id: 'default_twin',
-                    wallet_address: blockchainData.wallet,
+                    twin_id: 'default_twin', // Mapping to the default twin entry if needed, but the backend expects user_id
+                    user_id: 'Piyush',
                 }),
             });
 
