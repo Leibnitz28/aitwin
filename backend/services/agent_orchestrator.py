@@ -14,10 +14,10 @@ Agents:
 import time
 import random
 import json
-from typing import List, Dict
-from openai import AsyncOpenAI
-from models.schemas import AgentStep, PersonalityTraits
-from config import Config
+from typing import List, Dict, Any
+from openai import AsyncOpenAI  # type: ignore
+from models.schemas import AgentStep, PersonalityTraits  # type: ignore
+from config import Config  # type: ignore
 
 
 class AgentOrchestrator:
@@ -30,13 +30,13 @@ class AgentOrchestrator:
     _memory: Dict[str, List[dict]] = {}
 
     # ── AI Client ─────────────────────────────────────────────────────────────
-    _client = None
+    _client: Any = None
 
     @classmethod
     def _init_client(cls):
         if cls._client is None:
             if Config.has_gemini():
-                import google.generativeai as genai
+                import google.generativeai as genai  # type: ignore
                 genai.configure(api_key=Config.GEMINI_API_KEY)
                 cls._client = "gemini"
             elif Config.has_openai():
@@ -112,7 +112,7 @@ class AgentOrchestrator:
             agent_name="Personality Analyzer",
             status="completed",
             output=f"Dominant trait: {dominant_trait} ({traits[dominant_trait]:.1f})",
-            duration_ms=round((time.time() - start) * 1000 + random.uniform(10, 50), 1),
+            duration_ms=round((time.time() - start) * 1000 + random.uniform(10, 50), 1),  # type: ignore
         ))
 
         # ── Agent 2: Writing Style Agent ──────────────────────────────────────
@@ -124,20 +124,32 @@ class AgentOrchestrator:
             agent_name="Writing Style Agent",
             status="completed",
             output=f"Tone set to: {style['tone']}",
-            duration_ms=round((time.time() - start) * 1000 + random.uniform(5, 30), 1),
+            duration_ms=round((time.time() - start) * 1000 + random.uniform(5, 30), 1),  # type: ignore
         ))
 
-        # ── Agent 3: Memory Agent ─────────────────────────────────────────────
+        # ── Agent 3: Memory Agent (Semantic Search via ChromaDB) ─────────────
         start = time.time()
-        memory = cls._memory.get(twin_id, [])
-        recent = memory[-3:] if memory else []
+        recent = []
+        try:
+            from services.vectordb_service import VectorDBService  # type: ignore
+            if VectorDBService.is_ready():
+                # Semantic search: find 3 most RELEVANT past conversations
+                recent = VectorDBService.search_conversations(
+                    twin_id=twin_id, query=message, n_results=3
+                )
+        except Exception:
+            pass
+        # Fallback to in-memory
+        if not recent:
+            memory = cls._memory.get(twin_id, [])
+            recent = memory[-3:] if memory else []  # type: ignore
         context["memory_context"] = recent
-        memory_output = f"Recalled {len(recent)} recent exchanges" if recent else "No prior context"
+        memory_output = f"Recalled {len(recent)} relevant exchanges (semantic)" if recent else "No prior context"
         agents_used.append(AgentStep(
             agent_name="Memory Agent",
             status="completed",
             output=memory_output,
-            duration_ms=round((time.time() - start) * 1000 + random.uniform(5, 20), 1),
+            duration_ms=round((time.time() - start) * 1000 + random.uniform(5, 20), 1),  # type: ignore
         ))
 
         # ── Agent 4: Response Generator ───────────────────────────────────────
@@ -147,7 +159,7 @@ class AgentOrchestrator:
             agent_name="Response Generator",
             status="completed",
             output=f"Generated {len(reply.split())} word response",
-            duration_ms=round((time.time() - start) * 1000 + random.uniform(50, 200), 1),
+            duration_ms=round((time.time() - start) * 1000 + random.uniform(50, 200), 1),  # type: ignore
         ))
 
         # ── Agent 5: Voice Agent ──────────────────────────────────────────────
@@ -157,18 +169,27 @@ class AgentOrchestrator:
             agent_name="Voice Agent",
             status="completed",
             output=f"Voice output: {'recommended' if needs_voice else 'text-only'}",
-            duration_ms=round((time.time() - start) * 1000 + random.uniform(3, 15), 1),
+            duration_ms=round((time.time() - start) * 1000 + random.uniform(3, 15), 1),  # type: ignore
         ))
 
-        # ── Store in memory ───────────────────────────────────────────────────
+        # ── Store in memory + ChromaDB ─────────────────────────────────────
         if twin_id not in cls._memory:
             cls._memory[twin_id] = []
         cls._memory[twin_id].append({
             "user": message,
             "ai": reply,
         })
-        # Keep last 50 exchanges
-        cls._memory[twin_id] = cls._memory[twin_id][-50:]
+        cls._memory[twin_id] = cls._memory[twin_id][-50:]  # type: ignore
+
+        # Persist to ChromaDB for long-term semantic retrieval
+        try:
+            from services.vectordb_service import VectorDBService  # type: ignore
+            if VectorDBService.is_ready():
+                VectorDBService.add_conversation(
+                    twin_id=twin_id, user_message=message, ai_reply=reply
+                )
+        except Exception:
+            pass
 
         return {
             "reply": reply,
@@ -205,7 +226,7 @@ class AgentOrchestrator:
 
             if client == "gemini":
                 try:
-                    import google.generativeai as genai
+                    import google.generativeai as genai  # type: ignore
                     model = genai.GenerativeModel('gemini-1.5-flash', system_instruction=system_prompt)
                     response = await model.generate_content_async(message)
                     return response.text.strip()

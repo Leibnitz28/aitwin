@@ -41,6 +41,12 @@ class Config:
     GCS_BUCKET_NAME: str = os.getenv("GCS_BUCKET_NAME", "")
     GCS_CREDENTIALS_PATH: str = os.getenv("GCS_CREDENTIALS_PATH", "")
 
+    # ── ChromaDB (Vector Database) ────────────────────────────────────────────
+    CHROMA_PERSIST_DIR: str = os.getenv("CHROMA_PERSIST_DIR", "./chroma_data")
+
+    # ── 3D AI Studio (Image to 3D) ────────────────────────────────────────────
+    THREE_D_AI_STUDIO_API_KEY: str = os.getenv("THREE_D_AI_STUDIO_API_KEY", "")
+
     @classmethod
     def has_openai(cls) -> bool:
         return bool(cls.OPENAI_API_KEY)
@@ -64,3 +70,15 @@ class Config:
     @classmethod
     def has_gcs(cls) -> bool:
         return bool(cls.GCS_BUCKET_NAME)
+
+    @classmethod
+    def has_chromadb(cls) -> bool:
+        try:
+            import chromadb  # noqa: F401
+            return True
+        except ImportError:
+            return False
+
+    @classmethod
+    def has_3d_ai_studio(cls) -> bool:
+        return bool(cls.THREE_D_AI_STUDIO_API_KEY)

@@ -45,6 +45,7 @@ class TwinCreate(BaseModel):
     user_id: str
     name: str = "My AI Twin"
     analysis: AnalysisResult
+    voice_id: Optional[str] = None
 
 
 class TwinResponse(BaseModel):
@@ -53,6 +54,7 @@ class TwinResponse(BaseModel):
     name: str = "My AI Twin"
     analysis: AnalysisResult
     voice_id: Optional[str] = None
+    avatar_url: Optional[str] = None
     blockchain_tx: Optional[str] = None
     conversation_count: int = 0
     created_at: datetime

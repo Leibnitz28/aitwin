@@ -11,6 +11,7 @@ from services.analysis_service import PersonalityAnalysisService
 from services.twin_service import TwinService
 from services.elevenlabs_service import ElevenLabsService
 from services.storage_service import StorageService
+from services.avatar3d_service import Avatar3DService
 from utils.helpers import sanitize_text
 from typing import List
 
@@ -48,6 +49,18 @@ async def upload_writing(payload: WritingUpload):
     if word_count >= 10:
         analysis = await PersonalityAnalysisService.analyze_writing(text)
 
+    # Persist writing sample to ChromaDB
+    try:
+        from services.vectordb_service import VectorDBService
+        if VectorDBService.is_ready():
+            VectorDBService.add_writing_sample(
+                user_id=payload.user_id,
+                text=text,
+                traits=analysis.traits.model_dump() if analysis else {},
+            )
+    except Exception:
+        pass
+
     return {
         "message": "Writing sample received",
         "user_id": payload.user_id,
@@ -55,6 +68,59 @@ async def upload_writing(payload: WritingUpload):
         "preview": text[:120] + ("..." if len(text) > 120 else ""),
         "analysis": analysis.model_dump() if analysis else None,
     }
+
+
+@router.post("/upload-avatar", summary="Upload an image to generate a 3D avatar")
+async def upload_avatar(
+    user_id: str = Form(...),
+    file: UploadFile = File(...),
+):
+    """
+    Accept an image file (.jpg, .png) and submit it to 3D AI Studio for 3D generation.
+    Returns a task_id to poll for completion.
+    """
+    allowed_types = {"image/jpeg", "image/png", "image/webp"}
+    if file.content_type not in allowed_types:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Unsupported image type: {file.content_type}. Use .jpg or .png",
+        )
+
+    contents = await file.read()
+    
+    # Submit to 3D AI Studio
+    result = await Avatar3DService.create_3d_model(contents)
+    
+    if "error" in result:
+        raise HTTPException(status_code=500, detail=result["error"])
+        
+    return {
+        "message": "3D generation task started",
+        "user_id": user_id,
+        "task_id": result["task_id"],
+        "status": "processing"
+    }
+
+
+@router.get("/avatar-status/{task_id}", summary="Check 3D avatar generation status")
+async def check_avatar_status(task_id: str, twin_id: str = None):
+    """
+    Poll the status of a 3D generation task from 3D AI Studio.
+    If twin_id is provided and status is succeeded, it saves the avatar_url to the twin.
+    """
+    result = await Avatar3DService.get_task_status(task_id)
+    
+    if "error" in result:
+        raise HTTPException(status_code=500, detail=result["error"])
+        
+    status = result.get("status")
+    model_url = result.get("model_url")
+    
+    # If a twin ID was given and the generation finished, save the URL
+    if twin_id and status == "succeeded" and model_url:
+        TwinService.set_avatar_url(twin_id, model_url)
+        
+    return result
 
 
 @router.post("/upload-voice", summary="Upload a voice audio file")
@@ -130,3 +196,31 @@ async def get_twin(twin_id: str):
     if not twin:
         raise HTTPException(status_code=404, detail="Twin not found")
     return twin
+
+
+@router.get("/search", summary="Semantic search for twins and conversations")
+async def search(q: str = "", n: int = 5):
+    """
+    Semantic search across twins and conversations using ChromaDB embeddings.
+    Returns twins and conversation snippets ranked by relevance.
+    """
+    if not q.strip():
+        raise HTTPException(status_code=400, detail="Query parameter 'q' is required")
+
+    try:
+        from services.vectordb_service import VectorDBService
+        if not VectorDBService.is_ready():
+            raise HTTPException(status_code=503, detail="Vector DB not available")
+
+        twins = VectorDBService.search_twins(query=q, n_results=n)
+        conversations = VectorDBService.search_similar_writing(query=q, n_results=n)
+
+        return {
+            "query": q,
+            "twins": twins,
+            "writing_samples": conversations,
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Search error: {str(e)}")

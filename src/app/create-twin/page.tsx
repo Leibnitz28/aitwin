@@ -6,16 +6,18 @@ import dynamic from 'next/dynamic';
 import GlassCard from '../components/GlassCard';
 import {
     Mic, FileText, Brain, Rocket, Upload, CheckCircle2,
-    Loader2, ArrowRight, ArrowLeft, Sparkles, AlertCircle
+    Loader2, ArrowRight, ArrowLeft, Sparkles, AlertCircle, MicOff
 } from 'lucide-react';
+import { useRef } from 'react';
 
 const DNAHelix3D = dynamic(() => import('../components/DNAHelix3D'), { ssr: false });
 
 const STEPS = [
     { id: 1, title: 'Upload Voice', icon: Mic, desc: 'Voice sample for cloning', color: '#22d3ee' },
-    { id: 2, title: 'Writing', icon: FileText, desc: 'Writing style analysis', color: '#818cf8' },
-    { id: 3, title: 'AI Analysis', icon: Brain, desc: 'Personality modeling', color: '#34d399' },
-    { id: 4, title: 'Deploy', icon: Rocket, desc: 'Blockchain deployment', color: '#f59e0b' },
+    { id: 2, title: 'Upload Image', icon: Upload, desc: 'Generate 3D Avatar', color: '#f472b6' },
+    { id: 3, title: 'Writing', icon: FileText, desc: 'Writing style analysis', color: '#818cf8' },
+    { id: 4, title: 'AI Analysis', icon: Brain, desc: 'Personality modeling', color: '#34d399' },
+    { id: 5, title: 'Deploy', icon: Rocket, desc: 'Blockchain deployment', color: '#f59e0b' },
 ];
 
 const AGENTS = ['Personality Analyzer', 'Writing Style Agent', 'Memory Agent', 'Response Generator', 'Voice Agent'];
@@ -26,8 +28,13 @@ const BACKEND_URL = 'http://localhost:8000';
 export default function CreateTwinPage() {
     const [currentStep, setCurrentStep] = useState(1);
     const [voiceFile, setVoiceFile] = useState<File | null>(null);
+    const [imageFile, setImageFile] = useState<File | null>(null);
     const [writingText, setWritingText] = useState('');
     const [voiceUploaded, setVoiceUploaded] = useState(false);
+    const [imageUploaded, setImageUploaded] = useState(false);
+    const [avatarTaskId, setAvatarTaskId] = useState<string | null>(null);
+    const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+    const [avatarProgress, setAvatarProgress] = useState(0);
     const [writingUploaded, setWritingUploaded] = useState(false);
     const [analyzing, setAnalyzing] = useState(false);
     const [analysisComplete, setAnalysisComplete] = useState(false);
@@ -35,9 +42,13 @@ export default function CreateTwinPage() {
     const [twinGenerated, setTwinGenerated] = useState(false);
     const [twinId, setTwinId] = useState('');
     const [twinName, setTwinName] = useState('');
+    const [clonedVoiceId, setClonedVoiceId] = useState<string | null>(null);
     const [personalityScores, setPersonalityScores] = useState<Record<string, number> | null>(null);
     const [loading, setLoading] = useState(false);
     const [dragOver, setDragOver] = useState(false);
+    const [isRecording, setIsRecording] = useState(false);
+    const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+    const audioChunksRef = useRef<Blob[]>([]);
 
     const handleVoiceUpload = async (file: File) => {
         setVoiceFile(file);
@@ -47,8 +58,11 @@ export default function CreateTwinPage() {
         formData.append('user_id', 'Piyush');
         try {
             const res = await fetch(`${BACKEND_URL}/upload-voice`, { method: 'POST', body: formData });
-            if (res.ok) setVoiceUploaded(true);
-            else alert(`Upload failed: ${await res.text()}`);
+            if (res.ok) {
+                const data = await res.json();
+                if (data.voice_id) setClonedVoiceId(data.voice_id);
+                setVoiceUploaded(true);
+            } else alert(`Upload failed: ${await res.text()}`);
         } catch (e: unknown) {
             if (e instanceof Error) alert(`Network error: ${e.message}`);
         } finally { setLoading(false); }
@@ -59,6 +73,86 @@ export default function CreateTwinPage() {
         setDragOver(false);
         const file = e.dataTransfer.files?.[0];
         if (file && file.type.startsWith('audio/')) handleVoiceUpload(file);
+    };
+
+    const startRecording = async () => {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            const recorder = new MediaRecorder(stream);
+            mediaRecorderRef.current = recorder;
+            audioChunksRef.current = [];
+
+            recorder.ondataavailable = (e) => {
+                if (e.data.size > 0) audioChunksRef.current.push(e.data);
+            };
+
+            recorder.onstop = () => {
+                const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
+                const file = new File([audioBlob], `recording_${Date.now()}.wav`, { type: 'audio/wav' });
+                handleVoiceUpload(file);
+                stream.getTracks().forEach(track => track.stop());
+            };
+
+            recorder.start();
+            setIsRecording(true);
+        } catch (err) {
+            console.error('Failed to start recording', err);
+            alert('Microphone access denied or not available.');
+        }
+    };
+
+    const stopRecording = () => {
+        if (mediaRecorderRef.current && isRecording) {
+            mediaRecorderRef.current.stop();
+            setIsRecording(false);
+        }
+    };
+
+    const handleImageUpload = async (file: File) => {
+        setImageFile(file);
+        setLoading(true);
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('user_id', 'Piyush');
+        try {
+            const res = await fetch(`${BACKEND_URL}/upload-avatar`, { method: 'POST', body: formData });
+            if (res.ok) {
+                const data = await res.json();
+                setAvatarTaskId(data.task_id);
+                // Start polling
+                pollAvatarStatus(data.task_id);
+            } else {
+                alert(`Upload failed: ${await res.text()}`);
+                setLoading(false);
+            }
+        } catch (e: unknown) {
+            if (e instanceof Error) alert(`Network error: ${e.message}`);
+            setLoading(false);
+        }
+    };
+
+    const pollAvatarStatus = async (taskId: string) => {
+        try {
+            const res = await fetch(`${BACKEND_URL}/avatar-status/${taskId}`);
+            if (res.ok) {
+                const data = await res.json();
+                if (data.status === 'succeeded' && data.model_url) {
+                    setAvatarUrl(data.model_url);
+                    setImageUploaded(true);
+                    setLoading(false);
+                } else if (data.status === 'failed') {
+                    alert('Avatar generation failed.');
+                    setLoading(false);
+                } else {
+                    setAvatarProgress(data.progress || 0);
+                    setTimeout(() => pollAvatarStatus(taskId), 5000);
+                }
+            } else {
+                setTimeout(() => pollAvatarStatus(taskId), 5000);
+            }
+        } catch {
+            setTimeout(() => pollAvatarStatus(taskId), 5000);
+        }
     };
 
     const handleWritingUpload = async () => {
@@ -109,6 +203,7 @@ export default function CreateTwinPage() {
                         overall_match: 94,
                         summary: 'AI Digital Twin Profile for Piyush',
                     },
+                    voice_id: clonedVoiceId,
                 }),
             });
             if (res.ok) {
@@ -121,8 +216,9 @@ export default function CreateTwinPage() {
 
     const canGoNext = () => {
         if (currentStep === 1) return voiceUploaded;
-        if (currentStep === 2) return writingUploaded;
-        if (currentStep === 3) return analysisComplete;
+        if (currentStep === 2) return imageUploaded || imageFile !== null; // allow proceeding while it bg-generates
+        if (currentStep === 3) return writingUploaded;
+        if (currentStep === 4) return analysisComplete;
         return false;
     };
 
@@ -245,9 +341,16 @@ export default function CreateTwinPage() {
                                             <div className="divider flex-1" />
                                         </div>
 
-                                        <button className="w-full px-6 py-3 rounded-xl glass text-cyan-400 font-semibold hover:bg-cyan-400/8 border border-cyan-400/20 transition-all flex items-center justify-center gap-2">
-                                            <Mic className="w-4 h-4" />
-                                            Record Now
+                                        <button 
+                                            onClick={isRecording ? stopRecording : startRecording}
+                                            className={`w-full px-6 py-3 rounded-xl font-semibold transition-all flex items-center justify-center gap-2 ${
+                                                isRecording 
+                                                    ? 'bg-red-500/20 text-red-500 border border-red-500/30 animate-pulse' 
+                                                    : 'glass text-cyan-400 hover:bg-cyan-400/8 border border-cyan-400/20'
+                                            }`}
+                                        >
+                                            {isRecording ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+                                            {isRecording ? 'Stop Recording' : 'Record Now'}
                                         </button>
 
                                         <button
@@ -270,8 +373,98 @@ export default function CreateTwinPage() {
                         </motion.div>
                     )}
 
-                    {/* ── Step 2: Writing Samples ────────────────── */}
+                    {/* ── Step 2: Image Upload (3D Avatar) ───────────── */}
                     {currentStep === 2 && (
+                        <motion.div key="step2-image" initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -40 }} transition={{ duration: 0.3 }}>
+                            <GlassCard hover={false} className="text-center p-8">
+                                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-pink-400 to-rose-500 flex items-center justify-center mx-auto mb-6 shadow-[0_0_24px_rgba(244,114,182,0.3)]">
+                                    <Upload className="w-8 h-8 text-white" />
+                                </div>
+                                <h2 className="text-2xl font-bold text-white mb-2">Upload a Photo</h2>
+                                <p className="text-gray-500 mb-8 max-w-md mx-auto text-sm leading-relaxed">
+                                    Upload a clear front-facing photo to generate your 3D digital avatar.
+                                </p>
+
+                                {!imageUploaded && avatarTaskId === null ? (
+                                    <div className="space-y-4">
+                                        <div
+                                            onClick={() => document.getElementById('image-upload')?.click()}
+                                            onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+                                            onDragLeave={() => setDragOver(false)}
+                                            onDrop={(e) => {
+                                                e.preventDefault();
+                                                setDragOver(false);
+                                                const file = e.dataTransfer.files?.[0];
+                                                if (file && file.type.startsWith('image/')) handleImageUpload(file);
+                                            }}
+                                            className={`border-2 border-dashed rounded-2xl p-10 cursor-pointer transition-all ${
+                                                dragOver
+                                                    ? 'border-pink-400/60 bg-pink-400/8'
+                                                    : 'border-white/10 hover:border-pink-400/30 hover:bg-pink-400/4'
+                                            }`}
+                                        >
+                                            <input id="image-upload" type="file" accept="image/jpeg, image/png, image/webp" onChange={e => { const f = e.target.files?.[0]; if (f) handleImageUpload(f); }} className="hidden" />
+                                            {loading
+                                                ? <Loader2 className="w-10 h-10 text-pink-400 mx-auto animate-spin" />
+                                                : (
+                                                    <>
+                                                        <Upload className={`w-10 h-10 mx-auto mb-3 transition-colors ${dragOver ? 'text-pink-400' : 'text-gray-600'}`} />
+                                                        <p className="text-gray-500 text-sm">
+                                                            Drop photo here, or <span className="text-pink-400">click to upload</span>
+                                                        </p>
+                                                        <p className="text-gray-700 text-xs mt-1">Supports .jpg, .png</p>
+                                                    </>
+                                                )
+                                            }
+                                        </div>
+
+                                        <button
+                                            onClick={() => { setImageUploaded(true); }}
+                                            className="text-xs text-gray-700 hover:text-gray-500 transition-colors"
+                                        >
+                                            Skip · No Avatar
+                                        </button>
+                                    </div>
+                                ) : !imageUploaded && avatarTaskId !== null ? (
+                                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center gap-4 py-8">
+                                        <div className="relative w-24 h-24">
+                                            <div className="absolute inset-0 rounded-full border-4 border-white/10" />
+                                            <svg className="absolute inset-0 w-full h-full -rotate-90">
+                                                <circle
+                                                    cx="48" cy="48" r="46"
+                                                    fill="none"
+                                                    stroke="#f472b6"
+                                                    strokeWidth="4"
+                                                    strokeDasharray="289"
+                                                    strokeDashoffset={289 - (289 * avatarProgress) / 100}
+                                                    strokeLinecap="round"
+                                                    className="transition-all duration-1000 ease-out"
+                                                />
+                                            </svg>
+                                            <div className="absolute inset-0 flex items-center justify-center">
+                                                <span className="text-xl font-bold text-pink-400">{avatarProgress}%</span>
+                                            </div>
+                                        </div>
+                                        <div className="text-center">
+                                            <p className="text-white font-semibold">Generating 3D Avatar...</p>
+                                            <p className="text-xs text-gray-500 mt-1">This takes about a minute. You can continue to the next step while we create it in the background.</p>
+                                        </div>
+                                    </motion.div>
+                                ) : (
+                                    <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="flex flex-col items-center gap-3">
+                                        <div className="w-16 h-16 rounded-full bg-emerald-400/10 flex items-center justify-center border-2 border-emerald-400/30">
+                                            <CheckCircle2 className="w-8 h-8 text-emerald-400" />
+                                        </div>
+                                        <p className="text-emerald-400 font-bold text-lg">Avatar Ready!</p>
+                                        <p className="text-gray-600 text-sm">Valid 3D model generated.</p>
+                                    </motion.div>
+                                )}
+                            </GlassCard>
+                        </motion.div>
+                    )}
+
+                    {/* ── Step 3: Writing Samples ────────────────── */}
+                    {currentStep === 3 && (
                         <motion.div key="step2" initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -40 }} transition={{ duration: 0.3 }}>
                             <GlassCard hover={false} className="text-center p-8">
                                 <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-400 to-blue-500 flex items-center justify-center mx-auto mb-6 shadow-[0_0_24px_rgba(129,140,248,0.3)]">
@@ -324,8 +517,8 @@ export default function CreateTwinPage() {
                         </motion.div>
                     )}
 
-                    {/* ── Step 3: AI Analysis ────────────────────── */}
-                    {currentStep === 3 && (
+                    {/* ── Step 4: AI Personality Analysis ────────────── */}
+                    {currentStep === 4 && (
                         <motion.div key="step3" initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -40 }} transition={{ duration: 0.3 }}>
                             <GlassCard hover={false} className="text-center p-8">
                                 <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-400 to-cyan-500 flex items-center justify-center mx-auto mb-6 shadow-[0_0_24px_rgba(52,211,153,0.3)]">
@@ -420,8 +613,8 @@ export default function CreateTwinPage() {
                         </motion.div>
                     )}
 
-                    {/* ── Step 4: Generate Twin ──────────────────── */}
-                    {currentStep === 4 && (
+                    {/* ── Step 5: Generate Your AI Twin ──────────── */}
+                    {currentStep === 5 && (
                         <motion.div key="step4" initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -40 }} transition={{ duration: 0.3 }}>
                             <GlassCard hover={false} className="text-center p-8">
                                 <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center mx-auto mb-6 shadow-[0_0_24px_rgba(251,191,36,0.3)]">
@@ -487,7 +680,7 @@ export default function CreateTwinPage() {
                                         </div>
                                         <div className="flex flex-col sm:flex-row gap-3 justify-center">
                                             <button
-                                                onClick={() => window.location.href = '/chat'}
+                                                onClick={() => window.location.href = `/chat-3d?twinId=${twinId}`}
                                                 className="px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold hover:shadow-[0_0_20px_rgba(34,211,238,0.3)] transition-all flex items-center gap-2 justify-center"
                                             >
                                                 <Sparkles className="w-4 h-4" />
