@@ -7,7 +7,7 @@ from fastapi import APIRouter, HTTPException
 from models.schemas import VoiceGenerationRequest, VoiceGenerationResponse
 from services.twin_service import TwinService
 from services.elevenlabs_service import ElevenLabsService
-from services.gcs_service import GCSService
+from services.storage_service import StorageService
 from utils.helpers import generate_short_id
 
 router = APIRouter()
@@ -34,12 +34,12 @@ async def generate_voice(payload: VoiceGenerationRequest):
     )
 
     if audio_bytes:
-        # Upload to GCS
-        audio_url = await GCSService.upload_tts_audio(audio_bytes, payload.twin_id)
+        # Upload to Local Storage
+        audio_url = await StorageService.upload_tts_audio(audio_bytes, payload.twin_id)
         provider = "elevenlabs"
     else:
-        # Mock URL for development
-        audio_url = f"https://storage.googleapis.com/echosoul-audio/tts_{payload.twin_id}_{generate_short_id()}.mp3"
+        # Fallback to None for development to prevent browser NotSupportedError
+        audio_url = None
         provider = "mock"
 
     return VoiceGenerationResponse(

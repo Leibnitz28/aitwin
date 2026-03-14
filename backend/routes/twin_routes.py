@@ -10,8 +10,9 @@ from models.schemas import (
 from services.analysis_service import PersonalityAnalysisService
 from services.twin_service import TwinService
 from services.elevenlabs_service import ElevenLabsService
-from services.gcs_service import GCSService
+from services.storage_service import StorageService
 from utils.helpers import sanitize_text
+from typing import List
 
 router = APIRouter()
 
@@ -77,8 +78,8 @@ async def upload_voice(
     contents = await file.read()
     size_kb = round(len(contents) / 1024, 1)
 
-    # Upload to GCS
-    storage_url = await GCSService.upload_voice_sample(contents, user_id)
+    # Upload to Local Storage
+    storage_url = await StorageService.upload_voice_sample(contents, user_id)
 
     # Attempt voice cloning via ElevenLabs
     voice_id = await ElevenLabsService.clone_voice(contents, f"twin_{user_id}")
@@ -113,6 +114,12 @@ async def analyze_personality(payload: WritingUpload):
             detail="Please provide at least 10 words for accurate analysis.",
         )
     return await PersonalityAnalysisService.analyze_writing(text)
+
+
+@router.get("/twins", response_model=List[TwinResponse], summary="List all available AI twins")
+async def list_twins():
+    """Retrieve all AI twins (for Explore/Marketplace)."""
+    return TwinService.list_twins()
 
 
 @router.get("/{twin_id}", response_model=TwinResponse, summary="Get an AI twin by ID")

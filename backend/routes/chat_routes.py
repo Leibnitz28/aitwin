@@ -56,8 +56,8 @@ async def chat_with_twin(payload: ChatMessage):
             # 6. Upload to GCS
             audio_url = await GCSService.upload_tts_audio(audio_bytes, payload.twin_id)
         else:
-            # Mock audio URL for development
-            audio_url = f"https://storage.googleapis.com/echosoul-audio/tts_{payload.twin_id}_mock.mp3"
+            # Fallback to None if TTS fails, prevents browser NotSupportedError from fake URL
+            audio_url = None
 
     # 7. Log to Snowflake
     await SnowflakeService.log_conversation(

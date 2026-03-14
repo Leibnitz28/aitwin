@@ -1,249 +1,71 @@
-# AI Personality Replicator
+# EchoSoul: AI Personality Replicator
 
-An intelligent application that replicates and analyzes personality traits using AI technology.
+An intelligent, multi-agent platform designed to replicate and interact with a user's digital personality twin using advanced AI, voice cloning, and blockchain technology.
 
-## 📁 Project Architecture
+## 🌟 Advancements Till Now (Current Architecture)
 
-```
-ai-personality-replicator/
-│
-├── backend/                    # Node.js/Express Backend
-│   ├── config/
-│   │   └── db.js              # MongoDB connection configuration
-│   ├── node_modules/          # Dependencies
-│   ├── .env                   # Environment variables
-│   ├── .gitignore             # Git ignore rules
-│   ├── index.js               # Alternative server entry point
-│   ├── server.js              # Main server entry point
-│   ├── package.json           # Backend dependencies
-│   └── package-lock.json      # Locked dependency versions
-│
-├── frontend/                   # React/Vue Frontend (To be created)
-│   ├── public/
-│   ├── src/
-│   ├── package.json
-│   └── README.md
-│
-├── models/                     # Database Models & Schemas
-│   ├── User.js               # User model
-│   ├── Personality.js        # Personality traits model
-│   └── Analysis.js           # Analysis results model
-│
-├── routes/                     # API Routes
-│   ├── users.js              # User endpoints
-│   ├── personality.js        # Personality endpoints
-│   └── analysis.js           # Analysis endpoints
-│
-├── config/                     # Configuration Files
-│   ├── db.js                 # Database configuration
-│   ├── env.example           # Environment template
-│   └── constants.js          # App constants
-│
-├── .env                        # Environment Variables (Root)
-└── README.md                   # Project Documentation
-```
+The project has completely evolved from its original Node.js/MongoDB structure into a robust, modern AI application stack. 
 
-## 🚀 Quick Start
+### 🖥️ Frontend (Next.js)
+- **Tech Stack**: Next.js 16 (React 19), TailwindCSS V4, Framer Motion, Three.js (@react-three/fiber).
+- **Features**: 
+  - Complete, responsive modern dark UI with dynamic routing.
+  - Implemented core pages: Home, Create Twin, Dashboard, Chat Interface, Voice Studio, Blockchain Verifier, and Analytics.
+  - Interactive onboarding flow to upload writing and voice samples.
 
-### Prerequisites
-- Node.js (v14+)
-- MongoDB Atlas account
-- npm or yarn
-
-### Backend Setup
-
-1. **Navigate to backend folder:**
-   ```bash
-   cd ai-personality-replicator/backend
-   ```
-
-2. **Install dependencies:**
-   ```bash
-   npm install
-   ```
-
-3. **Configure environment variables:**
-   ```
-   PORT=5001
-   NODE_ENV=development
-   MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/?appName=Cluster0
-   ```
-
-4. **Start the server:**
-   ```bash
-   npm start
-   ```
-
-Server will run on `http://localhost:5001`
-
-## 📦 Backend Dependencies
-
-```json
-{
-  "express": "^4.19.2",        // Web framework
-  "mongoose": "^9.3.0",        // MongoDB ODM
-  "cors": "^2.8.5",            // CORS middleware
-  "dotenv": "^16.6.1"          // Environment variables
-}
-```
-
-### Dev Dependencies
-```json
-{
-  "nodemon": "^3.1.4"          // Auto-reload on file changes
-}
-```
-
-## 🔌 API Endpoints
-
-### Base URL: `http://localhost:5001`
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/` | Server health check |
-| GET | `/api/users` | Get all users (to be implemented) |
-| POST | `/api/users` | Create new user (to be implemented) |
-| GET | `/api/personality/:id` | Get personality analysis (to be implemented) |
-| POST | `/api/personality` | Create personality analysis (to be implemented) |
-
-## 🗄️ Database Structure
-
-### MongoDB Collections
-
-#### Users
-```javascript
-{
-  _id: ObjectId,
-  name: String,
-  email: String,
-  createdAt: Date,
-  updatedAt: Date
-}
-```
-
-#### Personalities
-```javascript
-{
-  _id: ObjectId,
-  userId: ObjectId,
-  traits: {
-    openness: Number,
-    conscientiousness: Number,
-    extraversion: Number,
-    agreeableness: Number,
-    neuroticism: Number
-  },
-  analysisDate: Date
-}
-```
-
-#### Analyses
-```javascript
-{
-  _id: ObjectId,
-  userId: ObjectId,
-  personalityId: ObjectId,
-  results: Object,
-  confidence: Number,
-  timestamp: Date
-}
-```
-
-## 🔧 Configuration
-
-### Environment Variables
-Create a `.env` file in the backend folder:
-
-```env
-# Server Configuration
-PORT=5001
-NODE_ENV=development
-
-# Database Configuration
-MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/?appName=Cluster0
-
-# API Configuration (to be added)
-# JWT_SECRET=your_jwt_secret
-# API_KEY=your_api_key
-```
-
-## 📝 Available Scripts
-
-### Backend Scripts
-```bash
-npm start          # Run server (node server.js)
-npm run dev        # Run with nodemon (auto-reload)
-npm test           # Run tests (to be configured)
-```
-
-## 🏗️ Project Structure Details
-
-### Backend (`/backend`)
-- **Entry Point**: `server.js`
-- **Framework**: Express.js
-- **Database**: MongoDB with Mongoose
-- **CORS**: Enabled for frontend integration
-
-### Frontend (`/frontend`)
-- **Status**: To be created
-- **Recommended**: React or Vue.js
-- **Build Tool**: Vite or Create React App
-
-### Models (`/models`)
-- Contains Mongoose schemas
-- Defines data structure for users, personalities, and analyses
-
-### Routes (`/routes`)
-- API endpoint handlers
-- Business logic separation
-- RESTful API design
-
-### Config (`/config`)
-- Environment management
-- Database connection
-- Application constants
-
-## 🔐 Security Notes
-
-- ⚠️ Never commit `.env` file with sensitive data
-- Credentials are included in `.gitignore`
-- Use environment variables for sensitive information
-- Whitelist IP addresses in MongoDB Atlas Network Access
-
-## 🌐 CORS Configuration
-
-Currently enabled for all origins. Update in production:
-
-```javascript
-app.use(cors({
-  origin: process.env.FRONTEND_URL,
-  credentials: true
-}));
-```
-
-## 🤝 Next Steps
-
-1. **Create database models** in `/models`
-2. **Setup API routes** in `/routes`
-3. **Create middleware** for authentication
-4. **Build frontend** in `/frontend`
-5. **Add tests** for backend APIs
-6. **Deploy** to production
-
-## 📞 Support
-
-For issues or help:
-- Check environment variables are set correctly
-- Ensure MongoDB is accessible
-- Verify IP is whitelisted in MongoDB Atlas
-- Check Node.js and npm versions
-
-## 📄 License
-
-ISC
+### ⚙️ Backend (FastAPI / Python)
+- **Tech Stack**: FastAPI, Uvicorn, Python 3.
+- **AI Orchestration**: Built a 5-agent pipeline (`agent_orchestrator.py`) utilizing OpenAI / Gemini to extract and analyze personality traits (Big Five).
+- **Voice Synthesis**: Successfully integrated **ElevenLabs** API for both voice cloning (from uploaded `.mp3`/`.wav` samples) and real-time Text-To-Speech generation.
+- **Analytics Integration**: Integrated **Snowflake** via `snowflake-connector-python` to securely log chat history and pull advanced platform metrics.
+- **Blockchain Identity**: Configured `web3.py` for minting Digital Twin identities onto the Ethereum Blockchain (Sepolia Testnet), assigning them unique NFTs.
+- **Storage Subsystem**: Transitioned away from Google Cloud Storage to a rapid **Local File Storage** (`StorageService`), meaning audio files and TTS generations are securely saved and served directly from the backend (`/uploads` directory) without requiring cloud keys.
 
 ---
 
-**Author**: Piyush
-**Created**: 2024
-**Status**: In Development
+## 🚀 What Work is Remaining?
+
+While the core functionality is active, the following segments require completion or polishing to reach a fully production-ready state:
+
+### 1. Smart Contract & Blockchain Hardening
+- **Deploy Smart Contract**: The Ethereum Contract Address is currently unassigned in the `.env` file. We need to deploy the actual Solidity ERC-721/ERC-1155 contract to Sepolia, verify it, and link the address.
+- **Frontend Web3 Integration**: Ensure users can connect their Web3 wallets (e.g., MetaMask) on the frontend to natively sign transactions and view their Twin NFT.
+
+### 2. Analytics Expansion
+- **Real-Time Data Sync**: While Snowflake logs are functional, the API currently utilizes a mock fallback for detailed charts (like accuracy scores and active users). We need to write the specific advanced SQL queries in `snowflake_service.py` to populate these charts dynamically.
+
+### 3. Authentication & Security
+- **User Accounts**: Currently, `user_id` generation is largely mocked/session-based. We need to implement a true authentication system (like NextAuth, Clerk, or JWT backend issuing) to secure user twins.
+- **API Rate Limiting**: Implement connection throttling on the FastAPI endpoints so that malicious users cannot drain ElevenLabs or OpenAI quotas.
+
+### 4. System Resiliency & Error Handling
+- **Graceful Degradations**: Add user-friendly UI toasts/modals to handle scenarios where an external API (like ElevenLabs or OpenAI) times out or runs out of credits.
+- **Job Queues**: Transition long-running AI analysis and voice-cloning tasks to asynchronous background workers (like Celery or Redis Queue) to prevent HTTP timeouts.
+
+### 5. Deployment & DevOps
+- **Dockerization**: Create `Dockerfile`s and a `docker-compose.yml` that cleanly packages both the Next.js frontend and the FastAPI backend.
+- **Production CDN**: Transition the local `StorageService` to an AWS S3/CloudFront or alternative architecture if scaling beyond a single local server is desired for production.
+
+---
+
+## 💻 Quick Start (Current Setup)
+
+### 1. Frontend
+```bash
+cd "Twin AI"
+npm install
+npm run dev
+```
+*Frontend runs on `http://localhost:3000`*
+
+### 2. Backend
+```bash
+cd "Twin AI/backend"
+# Activate your virtual environment
+.\venv\Scripts\activate  # Windows
+# or source venv/bin/activate # Mac/Linux
+
+pip install -r requirements.txt
+python main.py
+```
+*Backend runs on `http://localhost:8000` (Swagger Docs at `/docs`)*

@@ -43,12 +43,14 @@ class AnalysisResult(BaseModel):
 
 class TwinCreate(BaseModel):
     user_id: str
+    name: str = "My AI Twin"
     analysis: AnalysisResult
 
 
 class TwinResponse(BaseModel):
     twin_id: str
     user_id: str
+    name: str = "My AI Twin"
     analysis: AnalysisResult
     voice_id: Optional[str] = None
     blockchain_tx: Optional[str] = None
@@ -99,7 +101,7 @@ class VoiceGenerationRequest(BaseModel):
 
 
 class VoiceGenerationResponse(BaseModel):
-    audio_url: str
+    audio_url: Optional[str] = None
     twin_id: str
     text_length: int
     provider: str = "elevenlabs"

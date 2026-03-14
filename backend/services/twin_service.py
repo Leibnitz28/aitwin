@@ -21,7 +21,7 @@ class TwinService:
     _chat_counts: dict = {}
 
     @classmethod
-    def create_twin(cls, user_id: str, analysis: AnalysisResult) -> TwinResponse:
+    def create_twin(cls, user_id: str, name: str, analysis: AnalysisResult) -> TwinResponse:
         """Create and store a new AI twin for a user."""
         twin_id = generate_id()
         now = datetime.utcnow()
@@ -29,6 +29,7 @@ class TwinService:
         twin = TwinResponse(
             twin_id=twin_id,
             user_id=user_id,
+            name=name,
             analysis=analysis,
             created_at=now,
         )
@@ -42,7 +43,24 @@ class TwinService:
     @classmethod
     def get_twin(cls, twin_id: str) -> Optional[TwinResponse]:
         """Retrieve a twin by its ID."""
-        return cls._twins.get(twin_id)
+        twin = cls._twins.get(twin_id)
+        # Fallback for development so UI doesn't break on backend restart
+        if not twin and twin_id == 'default_twin':
+            from models.schemas import AnalysisResult
+            analysis = AnalysisResult(
+                traits={"openness": 88, "conscientiousness": 75, "extraversion": 60, "agreeableness": 82, "neuroticism": 35},
+                overall_match=94.5,
+                communication_style="Creative, thoughtful, and analytical.",
+                warnings=[]
+            )
+            twin = cls.create_twin(user_id="default_user", name="General Assistant", analysis=analysis)
+            # Reassign id to match the requested one
+            cls._twins.pop(twin.twin_id)
+            twin.twin_id = twin_id
+            cls._twins[twin_id] = twin
+            cls._user_to_twin["default_user"] = twin_id
+            
+        return twin
 
     @classmethod
     def get_twin_by_user(cls, user_id: str) -> Optional[TwinResponse]:
@@ -55,7 +73,29 @@ class TwinService:
     @classmethod
     def list_twins(cls) -> List[TwinResponse]:
         """Return all stored twins."""
+        # Auto-seed if empty for the Explore page demo
+        if not cls._twins:
+            cls.seed_dummy_twins()
         return list(cls._twins.values())
+
+    @classmethod
+    def seed_dummy_twins(cls):
+        """Seed twin store with 3 distinct dummy personalities for Explore."""
+        from models.schemas import AnalysisResult
+        profiles = [
+            ("creative_writer", "Creative Storyteller", "Imaginative, expressive, and passionate about storytelling.", {"openness": 95, "conscientiousness": 60, "extraversion": 75, "agreeableness": 80, "neuroticism": 40}, 92),
+            ("logic_coder", "Logical Coder", "Direct, analytical, and highly structured.", {"openness": 70, "conscientiousness": 95, "extraversion": 40, "agreeableness": 65, "neuroticism": 25}, 88),
+            ("empath_coach", "Empathic Coach", "Warm, supportive, and extremely empathetic.", {"openness": 85, "conscientiousness": 80, "extraversion": 90, "agreeableness": 98, "neuroticism": 45}, 96),
+        ]
+        
+        for user_id, name, style, traits, match in profiles:
+            analysis = AnalysisResult(
+                traits=traits,
+                overall_match=match,
+                communication_style=style,
+                warnings=[]
+            )
+            cls.create_twin(user_id=user_id, name=name, analysis=analysis)
 
     @classmethod
     def increment_chat_count(cls, twin_id: str):

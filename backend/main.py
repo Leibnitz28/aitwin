@@ -8,6 +8,8 @@ Snowflake analytics, and Google Cloud Storage.
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from routes import chat_routes, twin_routes, voice_routes, blockchain_routes, analytics_routes
+from fastapi.staticfiles import StaticFiles
+from pathlib import Path
 from config import Config
 import uvicorn
 
@@ -36,6 +38,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# ── Local Storage ─────────────────────────────────────────────────────────────
+UPLOAD_DIR = Path(__file__).parent / "uploads"
+UPLOAD_DIR.mkdir(exist_ok=True)
+app.mount("/uploads", StaticFiles(directory=str(UPLOAD_DIR)), name="uploads")
 
 # ── Routes ────────────────────────────────────────────────────────────────────
 app.include_router(chat_routes.router,       tags=["💬 Chat"])
