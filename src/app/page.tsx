@@ -21,7 +21,7 @@ const features = [
     icon: Mic,
     title: 'Voice Cloning',
     desc: 'ElevenLabs voice synthesis creates a perfect digital replica of your voice patterns.',
-    color: 'from-purple-400 to-pink-500',
+    color: 'from-blue-400 to-sky-500',
     glow: 'rgba(139, 92, 246, 0.2)',
   },
   {
@@ -112,7 +112,7 @@ export default function LandingPage() {
             className="flex flex-col sm:flex-row items-center justify-center gap-4"
           >
             <Link href="/create-twin">
-              <button className="group px-8 py-4 rounded-2xl bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-bold text-lg hover:shadow-[0_0_40px_rgba(0,245,255,0.3)] transition-all hover:scale-105 flex items-center gap-2">
+              <button className="group px-8 py-4 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold text-lg hover:shadow-[0_0_40px_rgba(0,245,255,0.3)] transition-all hover:scale-105 flex items-center gap-2">
                 Create Your Twin
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </button>
@@ -274,7 +274,7 @@ export default function LandingPage() {
             Join the future of digital identity. Your EchoSoul is waiting to be born.
           </p>
           <Link href="/create-twin">
-            <button className="px-10 py-4 rounded-2xl bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-bold text-lg hover:shadow-[0_0_40px_rgba(0,245,255,0.3)] transition-all hover:scale-105">
+            <button className="px-10 py-4 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold text-lg hover:shadow-[0_0_40px_rgba(0,245,255,0.3)] transition-all hover:scale-105">
               Get Started Now
             </button>
           </Link>

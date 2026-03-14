@@ -101,15 +101,15 @@ export default function ChatPage() {
     };
 
     return (
-        <div className="h-[calc(100dvh-64px)] flex flex-col px-4 py-4">
-            <div className="max-w-4xl mx-auto w-full flex flex-col h-full">
+        <div className="h-[calc(100dvh-64px)] flex flex-col px-4 py-4 relative z-10">
+            <div className="max-w-4xl mx-auto w-full flex flex-col h-full relative z-10">
                 {/* Header */}
                 <motion.div
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     className="glass-strong p-4 rounded-2xl mb-4 flex items-center gap-3"
                 >
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400 to-purple-500 flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center">
                         <Bot className="w-5 h-5 text-white" />
                     </div>
                     <div>
@@ -137,7 +137,7 @@ export default function ChatPage() {
                             <div className={`max-w-[80%] flex gap-3 ${msg.sender === 'user' ? 'flex-row-reverse' : ''}`}>
                                 <div
                                     className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${msg.sender === 'user'
-                                        ? 'bg-gradient-to-br from-blue-500 to-purple-600'
+                                        ? 'bg-gradient-to-br from-blue-500 to-blue-600'
                                         : 'bg-gradient-to-br from-cyan-400 to-emerald-500'
                                         }`}
                                 >
@@ -146,7 +146,7 @@ export default function ChatPage() {
                                 <div>
                                     <div
                                         className={`px-4 py-3 rounded-2xl text-sm leading-relaxed ${msg.sender === 'user'
-                                            ? 'bg-gradient-to-r from-blue-600/40 to-purple-600/40 text-white rounded-tr-md'
+                                            ? 'bg-gradient-to-r from-blue-600/40 to-blue-600/40 text-white rounded-tr-md'
                                             : 'glass text-gray-200 rounded-tl-md'
                                             }`}
                                     >
@@ -201,7 +201,7 @@ export default function ChatPage() {
                     <button
                         onClick={sendMessage}
                         disabled={!input.trim()}
-                        className="w-10 h-10 rounded-xl bg-gradient-to-r from-cyan-500 to-purple-600 flex items-center justify-center text-white hover:shadow-[0_0_20px_rgba(0,245,255,0.3)] transition-all hover:scale-105 disabled:opacity-30"
+                        className="w-10 h-10 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 flex items-center justify-center text-white hover:shadow-[0_0_20px_rgba(0,245,255,0.3)] transition-all hover:scale-105 disabled:opacity-30"
                     >
                         <Send className="w-4 h-4" />
                     </button>

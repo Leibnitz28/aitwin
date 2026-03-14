@@ -32,7 +32,7 @@ export default function Navbar() {
                 <div className="flex items-center justify-between h-16">
                     {/* Logo */}
                     <Link href="/" className="flex items-center gap-2 group">
-                        <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-cyan-400 to-purple-500 flex items-center justify-center group-hover:shadow-[0_0_20px_rgba(0,245,255,0.4)] transition-shadow">
+                        <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center group-hover:shadow-[0_0_20px_rgba(0,245,255,0.4)] transition-shadow">
                             <Brain className="w-5 h-5 text-white" />
                         </div>
                         <span className="text-lg font-bold gradient-text hidden sm:block">EchoSoul</span>
@@ -56,7 +56,7 @@ export default function Navbar() {
 
                     {/* Connect Wallet */}
                     <div className="hidden md:block">
-                        <button className="px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-purple-600 text-white text-sm font-semibold hover:shadow-[0_0_25px_rgba(0,245,255,0.3)] transition-all hover:scale-105">
+                        <button className="px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white text-sm font-semibold hover:shadow-[0_0_25px_rgba(0,245,255,0.3)] transition-all hover:scale-105">
                             Connect Wallet
                         </button>
                     </div>
@@ -92,7 +92,7 @@ export default function Navbar() {
                                 {link.label}
                             </Link>
                         ))}
-                        <button className="mt-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-purple-600 text-white text-sm font-semibold">
+                        <button className="mt-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white text-sm font-semibold">
                             Connect Wallet
                         </button>
                     </div>

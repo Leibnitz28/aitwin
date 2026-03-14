@@ -20,7 +20,11 @@ html {
 }
 
 body {
-  background: radial-gradient(circle at top, #0c0f1d, var(--dark-bg));
+  background-image: 
+    radial-gradient(circle at top, rgba(12, 15, 29, 0.7), rgba(3, 3, 11, 0.95)), 
+    url('/ai_brain_bg.png');
+  background-size: cover;
+  background-position: center;
   background-attachment: fixed;
   color: #f8fafc;
   font-family: 'Outfit', 'Segoe UI', -apple-system, sans-serif;
@@ -62,10 +66,9 @@ body {
   border-radius: 20px;
 }
 
-/* Neon Glow */
 .neon-glow {
   box-shadow: 0 0 15px rgba(0, 245, 255, 0.15),
-    0 0 40px rgba(139, 92, 246, 0.08);
+    0 0 40px rgba(96, 165, 250, 0.08);
 }
 
 .neon-text {
@@ -75,7 +78,7 @@ body {
 
 /* Gradients */
 .gradient-text {
-  background: linear-gradient(135deg, #ffffff, #a5b4fc, #fbcfe8);
+  background: linear-gradient(135deg, #ffffff, #a5b4fc, #93c5fd);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -92,7 +95,7 @@ body {
   inset: 0;
   border-radius: inherit;
   padding: 1px;
-  background: linear-gradient(135deg, rgba(165, 180, 252, 0.4), rgba(192, 132, 252, 0.4), rgba(251, 207, 232, 0.4));
+  background: linear-gradient(135deg, rgba(165, 180, 252, 0.4), rgba(96, 165, 250, 0.4), rgba(34, 211, 238, 0.4));
   mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   mask-composite: exclude;
   -webkit-mask-composite: xor;

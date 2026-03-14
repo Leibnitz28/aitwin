@@ -168,7 +168,7 @@ export default function CreateTwinPage() {
                                 className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-xs sm:text-sm font-bold transition-all ${currentStep > step.id
                                     ? 'bg-emerald-500 text-white'
                                     : currentStep === step.id
-                                        ? 'bg-gradient-to-r from-cyan-500 to-purple-600 text-white shadow-[0_0_20px_rgba(0,245,255,0.3)]'
+                                        ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-[0_0_20px_rgba(0,245,255,0.3)]'
                                         : 'glass text-gray-500'
                                     }`}
                             >
@@ -258,7 +258,7 @@ export default function CreateTwinPage() {
                             exit={{ opacity: 0, x: -50 }}
                         >
                             <GlassCard hover={false} className="text-center">
-                                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-purple-400 to-pink-500 flex items-center justify-center mx-auto mb-6">
+                                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-400 to-sky-500 flex items-center justify-center mx-auto mb-6">
                                     <FileText className="w-10 h-10 text-white" />
                                 </div>
                                 <h2 className="text-2xl font-bold text-white mb-2">Upload Writing Samples</h2>
@@ -272,13 +272,13 @@ export default function CreateTwinPage() {
                                             placeholder="Paste your writing samples here (emails, blogs, social posts)..."
                                             value={writingText}
                                             onChange={(e) => setWritingText(e.target.value)}
-                                            className="w-full h-48 rounded-xl glass p-4 text-gray-300 placeholder:text-gray-600 resize-none focus:outline-none focus:border-purple-400/30"
+                                            className="w-full h-48 rounded-xl glass p-4 text-gray-300 placeholder:text-gray-600 resize-none focus:outline-none focus:border-blue-400/30"
                                             style={{ background: 'rgba(15, 15, 35, 0.4)', border: '1px solid rgba(255,255,255,0.08)' }}
                                         />
                                         <button
                                             onClick={handleWritingUpload}
                                             disabled={loading || !writingText.trim()}
-                                            className="px-8 py-3 rounded-xl bg-purple-600 text-white font-bold hover:bg-purple-500 disabled:opacity-50 transition-all flex items-center gap-2 mx-auto"
+                                            className="px-8 py-3 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-500 disabled:opacity-50 transition-all flex items-center gap-2 mx-auto"
                                         >
                                             {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <FileText className="w-5 h-5" />}
                                             Analyze Writing Style
@@ -345,7 +345,7 @@ export default function CreateTwinPage() {
                                                                 initial={{ width: '0%' }}
                                                                 animate={{ width: '100%' }}
                                                                 transition={{ delay: i * 0.4, duration: 2 }}
-                                                                className="h-full rounded-full bg-gradient-to-r from-cyan-400 to-purple-500"
+                                                                className="h-full rounded-full bg-gradient-to-r from-cyan-400 to-blue-500"
                                                             />
                                                         </div>
                                                     </motion.div>
@@ -391,7 +391,7 @@ export default function CreateTwinPage() {
                             exit={{ opacity: 0, x: -50 }}
                         >
                             <GlassCard hover={false} className="text-center">
-                                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-pink-400 to-orange-500 flex items-center justify-center mx-auto mb-6">
+                                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-sky-400 to-orange-500 flex items-center justify-center mx-auto mb-6">
                                     <Rocket className="w-10 h-10 text-white" />
                                 </div>
                                 <h2 className="text-2xl font-bold text-white mb-2">Generate Your AI Twin</h2>
@@ -403,13 +403,13 @@ export default function CreateTwinPage() {
                                     !generating ? (
                                         <button
                                             onClick={handleGenerate}
-                                            className="px-8 py-4 rounded-2xl bg-gradient-to-r from-pink-500 to-orange-500 text-white font-bold text-lg hover:shadow-[0_0_30px_rgba(236,72,153,0.3)] transition-all hover:scale-105"
+                                            className="px-8 py-4 rounded-2xl bg-gradient-to-r from-sky-500 to-orange-500 text-white font-bold text-lg hover:shadow-[0_0_30px_rgba(236,72,153,0.3)] transition-all hover:scale-105"
                                         >
                                             🚀 Generate Twin
                                         </button>
                                     ) : (
                                         <div className="space-y-4">
-                                            <Loader2 className="w-16 h-16 text-pink-400 mx-auto animate-spin" />
+                                            <Loader2 className="w-16 h-16 text-sky-400 mx-auto animate-spin" />
                                             <p className="text-gray-400">Deploying your AI twin to the network...</p>
                                         </div>
                                     )
@@ -454,7 +454,7 @@ export default function CreateTwinPage() {
                     <button
                         onClick={() => setCurrentStep(Math.min(4, currentStep + 1))}
                         disabled={currentStep === 4}
-                        className="px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-semibold disabled:opacity-30 hover:shadow-[0_0_20px_rgba(0,245,255,0.2)] transition-all flex items-center gap-2"
+                        className="px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold disabled:opacity-30 hover:shadow-[0_0_20px_rgba(0,245,255,0.2)] transition-all flex items-center gap-2"
                     >
                         Next
                         <ArrowRight className="w-4 h-4" />

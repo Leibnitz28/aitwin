@@ -104,13 +104,13 @@ export default function BlockchainPage() {
                     {/* Twin Token */}
                     <GlassCard delay={0.1}>
                         <div className="flex items-center gap-3 mb-4">
-                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center">
+                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-sky-600 flex items-center justify-center">
                                 <Hash className="w-5 h-5 text-white" />
                             </div>
                             <h3 className="text-white font-bold">Twin Token ID</h3>
                         </div>
                         <div className="flex items-center gap-2 glass p-3 rounded-xl">
-                            <p className="text-purple-400 font-mono text-sm flex-1">AI-TWIN {blockchainData.tokenId}</p>
+                            <p className="text-blue-400 font-mono text-sm flex-1">AI-TWIN {blockchainData.tokenId}</p>
                             <button
                                 onClick={() => copyToClipboard(blockchainData.tokenId, 'token')}
                                 className="text-gray-500 hover:text-white transition-colors flex-shrink-0"

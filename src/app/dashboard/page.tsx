@@ -30,7 +30,7 @@ export default function DashboardPage() {
                 {/* Twin Profile Card */}
                 <GlassCard hover={false} className="mb-8 p-8">
                     <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
-                        <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-cyan-400 to-purple-500 flex items-center justify-center text-3xl font-black text-white shadow-[0_0_30px_rgba(0,245,255,0.2)]">
+                        <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center text-3xl font-black text-white shadow-[0_0_30px_rgba(0,245,255,0.2)]">
                             PT
                         </div>
                         <div className="flex-1">
@@ -43,7 +43,7 @@ export default function DashboardPage() {
                                 <span className="px-3 py-1 rounded-full text-xs font-medium bg-cyan-400/10 text-cyan-400">
                                     Voice Model Active
                                 </span>
-                                <span className="px-3 py-1 rounded-full text-xs font-medium bg-purple-400/10 text-purple-400">
+                                <span className="px-3 py-1 rounded-full text-xs font-medium bg-blue-400/10 text-blue-400">
                                     Blockchain Verified
                                 </span>
                             </div>
@@ -55,7 +55,7 @@ export default function DashboardPage() {
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                     {[
                         { label: 'Personality Score', value: '94%', icon: Brain, color: 'from-cyan-400 to-blue-500', glow: 'rgba(0,245,255,0.15)' },
-                        { label: 'Voice Fidelity', value: '97%', icon: Mic, color: 'from-purple-400 to-pink-500', glow: 'rgba(139,92,246,0.15)' },
+                        { label: 'Voice Fidelity', value: '97%', icon: Mic, color: 'from-blue-400 to-sky-500', glow: 'rgba(139,92,246,0.15)' },
                         { label: 'Conversations', value: '142', icon: MessageSquare, color: 'from-emerald-400 to-cyan-500', glow: 'rgba(16,185,129,0.15)' },
                         { label: 'Blockchain ID', value: 'Verified', icon: Shield, color: 'from-amber-400 to-orange-500', glow: 'rgba(245,158,11,0.15)' },
                     ].map((stat, i) => (
@@ -85,7 +85,7 @@ export default function DashboardPage() {
                     </Link>
                     <Link href="/voice">
                         <GlassCard className="cursor-pointer group text-center" delay={0.1}>
-                            <Mic className="w-10 h-10 text-purple-400 mx-auto mb-3 group-hover:scale-110 transition-transform" />
+                            <Mic className="w-10 h-10 text-blue-400 mx-auto mb-3 group-hover:scale-110 transition-transform" />
                             <h3 className="text-white font-bold text-lg mb-1">Talk with Twin</h3>
                             <p className="text-gray-500 text-sm">Voice conversation with cloned voice</p>
                         </GlassCard>

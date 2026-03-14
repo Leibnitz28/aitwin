@@ -98,7 +98,7 @@ export default function AnalyticsPage() {
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                     {[
                         { label: 'Total Conversations', value: analytics?.total_conversations || 0, change: '+12%', icon: MessageSquare, color: 'from-cyan-400 to-blue-500' },
-                        { label: 'Active Users', value: analytics?.active_users || 1, change: '+8%', icon: Users, color: 'from-purple-400 to-pink-500' },
+                        { label: 'Active Users', value: analytics?.active_users || 1, change: '+8%', icon: Users, color: 'from-blue-400 to-sky-500' },
                         { label: 'Accuracy Score', value: `${analytics?.avg_accuracy || 94.2}%`, change: '+2.1%', icon: Brain, color: 'from-emerald-400 to-cyan-500' },
                         { label: 'Avg Response Time', value: `${analytics?.avg_response_time || 1.3}s`, change: '-0.2s', icon: Activity, color: 'from-amber-400 to-orange-500' },
                     ].map((stat, i) => (
@@ -175,7 +175,7 @@ export default function AnalyticsPage() {
                     {/* Radar Chart */}
                     <GlassCard hover={false}>
                         <h3 className="text-white font-bold mb-6 flex items-center gap-2">
-                            <Brain className="w-5 h-5 text-purple-400" />
+                            <Brain className="w-5 h-5 text-blue-400" />
                             Personality Profile
                         </h3>
                         <div className="h-72">

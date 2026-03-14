@@ -73,7 +73,7 @@ export default function VoicePage() {
                                             repeat: Infinity,
                                             repeatType: 'reverse',
                                         }}
-                                        className="w-1.5 rounded-full bg-gradient-to-t from-cyan-400 to-purple-500"
+                                        className="w-1.5 rounded-full bg-gradient-to-t from-cyan-400 to-blue-500"
                                         style={{ minHeight: 10 }}
                                     />
                                 ))}
@@ -110,7 +110,7 @@ export default function VoicePage() {
                             onClick={toggleListening}
                             className={`w-20 h-20 rounded-full flex items-center justify-center transition-all ${isListening
                                 ? 'bg-red-500 shadow-[0_0_40px_rgba(239,68,68,0.4)] animate-pulse'
-                                : 'bg-gradient-to-r from-cyan-500 to-purple-600 shadow-[0_0_30px_rgba(0,245,255,0.3)] hover:shadow-[0_0_50px_rgba(0,245,255,0.4)]'
+                                : 'bg-gradient-to-r from-cyan-500 to-blue-600 shadow-[0_0_30px_rgba(0,245,255,0.3)] hover:shadow-[0_0_50px_rgba(0,245,255,0.4)]'
                                 }`}
                         >
                             {isListening ? <MicOff className="w-8 h-8 text-white" /> : <Mic className="w-8 h-8 text-white" />}
@@ -149,7 +149,7 @@ export default function VoicePage() {
                                 >
                                     <div
                                         className={`w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center ${msg.sender === 'user'
-                                            ? 'bg-gradient-to-br from-blue-500 to-purple-600'
+                                            ? 'bg-gradient-to-br from-blue-500 to-blue-600'
                                             : 'bg-gradient-to-br from-cyan-400 to-emerald-500'
                                             }`}
                                     >

@@ -73,7 +73,7 @@ function FloatingConnections() {
                 return (
                     <primitive
                         key={i}
-                        object={new THREE.Line(geometry, new THREE.LineBasicMaterial({ color: '#8b5cf6', transparent: true, opacity: 0.08 }))}
+                        object={new THREE.Line(geometry, new THREE.LineBasicMaterial({ color: '#0ea5e9', transparent: true, opacity: 0.08 }))}
                     />
                 );
             })}
