@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import GlassCard from '../components/GlassCard';
 import {
@@ -29,14 +30,6 @@ const accuracyData = [
     { name: 'Week 6', accuracy: 94 },
 ];
 
-const personalityRadar = [
-    { trait: 'Openness', score: 87 },
-    { trait: 'Conscientiousness', score: 72 },
-    { trait: 'Extraversion', score: 65 },
-    { trait: 'Agreeableness', score: 81 },
-    { trait: 'Neuroticism', score: 38 },
-];
-
 const customTooltipStyle = {
     backgroundColor: 'rgba(15, 15, 35, 0.9)',
     border: '1px solid rgba(255,255,255,0.1)',
@@ -46,7 +39,50 @@ const customTooltipStyle = {
     fontSize: '12px',
 };
 
+const BACKEND_URL = 'http://localhost:8000';
+
 export default function AnalyticsPage() {
+    const [loading, setLoading] = useState(true);
+    const [analytics, setAnalytics] = useState<any>(null);
+
+    useEffect(() => {
+        const fetchAnalytics = async () => {
+            try {
+                const response = await fetch(`${BACKEND_URL}/analytics`);
+                if (response.ok) {
+                    const data = await response.json();
+                    setAnalytics(data);
+                }
+            } catch (error) {
+                console.error('Analytics fetch error:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchAnalytics();
+    }, []);
+
+    const personalityRadar = analytics ? [
+        { trait: 'Openness', score: analytics.personality_scores.openness },
+        { trait: 'Conscientiousness', score: analytics.personality_scores.conscientiousness },
+        { trait: 'Extraversion', score: analytics.personality_scores.extraversion },
+        { trait: 'Agreeableness', score: analytics.personality_scores.agreeableness },
+        { trait: 'Neuroticism', score: analytics.personality_scores.neuroticism },
+    ] : [
+        { trait: 'Openness', score: 87 },
+        { trait: 'Conscientiousness', score: 72 },
+        { trait: 'Extraversion', score: 65 },
+        { trait: 'Agreeableness', score: 81 },
+        { trait: 'Neuroticism', score: 38 },
+    ];
+
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center h-screen">
+                <Activity className="w-12 h-12 text-cyan-400 animate-pulse" />
+            </div>
+        );
+    }
     return (
         <div className="min-h-screen px-4 py-12">
             <div className="max-w-6xl mx-auto">
@@ -61,10 +97,10 @@ export default function AnalyticsPage() {
                 {/* Stats Row */}
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                     {[
-                        { label: 'Total Conversations', value: '1,247', change: '+12%', icon: MessageSquare, color: 'from-cyan-400 to-blue-500' },
-                        { label: 'Active Users', value: '89', change: '+8%', icon: Users, color: 'from-purple-400 to-pink-500' },
-                        { label: 'Accuracy Score', value: '94.2%', change: '+2.1%', icon: Brain, color: 'from-emerald-400 to-cyan-500' },
-                        { label: 'Avg Response Time', value: '1.3s', change: '-0.2s', icon: Activity, color: 'from-amber-400 to-orange-500' },
+                        { label: 'Total Conversations', value: analytics?.total_conversations || 0, change: '+12%', icon: MessageSquare, color: 'from-cyan-400 to-blue-500' },
+                        { label: 'Active Users', value: analytics?.active_users || 1, change: '+8%', icon: Users, color: 'from-purple-400 to-pink-500' },
+                        { label: 'Accuracy Score', value: `${analytics?.avg_accuracy || 94.2}%`, change: '+2.1%', icon: Brain, color: 'from-emerald-400 to-cyan-500' },
+                        { label: 'Avg Response Time', value: `${analytics?.avg_response_time || 1.3}s`, change: '-0.2s', icon: Activity, color: 'from-amber-400 to-orange-500' },
                     ].map((stat, i) => (
                         <GlassCard key={i} delay={i * 0.1}>
                             <div className="flex items-center justify-between mb-3">
@@ -168,12 +204,11 @@ export default function AnalyticsPage() {
                         </h3>
                         <div className="space-y-5">
                             {[
-                                { label: 'Text Conversations', value: 892, max: 1000, color: '#00f5ff' },
-                                { label: 'Voice Conversations', value: 355, max: 1000, color: '#8b5cf6' },
-                                { label: 'Writing Samples Processed', value: 47, max: 50, color: '#10b981' },
-                                { label: 'Voice Samples Used', value: 12, max: 20, color: '#ec4899' },
-                                { label: 'Blockchain Transactions', value: 3, max: 10, color: '#f59e0b' },
-                                { label: 'Agent Invocations', value: 4280, max: 5000, color: '#3b82f6' },
+                                { label: 'Text Conversations', value: analytics?.usage_stats?.text_convs || 0, max: 1000, color: '#00f5ff' },
+                                { label: 'Voice Conversations', value: analytics?.usage_stats?.voice_convs || 0, max: 1000, color: '#8b5cf6' },
+                                { label: 'Writing Samples Processed', value: analytics?.usage_stats?.samples_processed || 0, max: 50, color: '#10b981' },
+                                { label: 'Blockchain Transactions', value: analytics?.usage_stats?.blockchain_txs || 0, max: 10, color: '#f59e0b' },
+                                { label: 'Agent Invocations', value: (analytics?.usage_stats?.text_convs || 0) * 5, max: 5000, color: '#3b82f6' },
                             ].map((item, i) => (
                                 <div key={i}>
                                     <div className="flex items-center justify-between mb-1.5">
@@ -183,8 +218,7 @@ export default function AnalyticsPage() {
                                     <div className="h-2 bg-white/5 rounded-full overflow-hidden">
                                         <motion.div
                                             initial={{ width: 0 }}
-                                            whileInView={{ width: `${(item.value / item.max) * 100}%` }}
-                                            viewport={{ once: true }}
+                                            animate={{ width: `${Math.min(100, (item.value / item.max) * 100)}%` }}
                                             transition={{ duration: 1, delay: i * 0.1 }}
                                             className="h-full rounded-full"
                                             style={{ backgroundColor: item.color }}

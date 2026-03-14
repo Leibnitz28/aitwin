@@ -11,13 +11,7 @@ interface Message {
     timestamp: string;
 }
 
-const aiResponses = [
-    "That's a really insightful question. Based on what I've learned from your personality patterns, I'd approach this with a blend of analytical thinking and creative problem-solving, which is very characteristic of your communication style.",
-    "Interesting! Your writing patterns suggest you value directness, so I'll be straightforward — I think this is a great idea. The personality analysis showed your openness score is 87%, which aligns perfectly with this kind of exploratory thinking.",
-    "I've noticed from your samples that you tend to think about problems from multiple angles. Let me reflect that: there are at least three ways to look at this, and I think each has its merits based on your typical decision-making framework.",
-    "Your EchoSoul replica here! Based on my deep analysis of your personality traits, I'd say you're more likely to take the creative approach here. Your conscientiousness is high (72%), so you'll also want a solid plan before diving in.",
-    "That resonates with your core personality traits. The memory agent has noted similar patterns in 14 previous conversations. You consistently lean toward innovative solutions while maintaining practical boundaries.",
-];
+const BACKEND_URL = 'http://localhost:8000';
 
 export default function ChatPage() {
     const [messages, setMessages] = useState<Message[]>([
@@ -31,34 +25,79 @@ export default function ChatPage() {
     const [input, setInput] = useState('');
     const [typing, setTyping] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const audioRef = useRef<HTMLAudioElement | null>(null);
 
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [messages]);
 
-    const sendMessage = () => {
-        if (!input.trim()) return;
+    const playAudio = (url: string) => {
+        if (!url) return;
+        if (audioRef.current) {
+            audioRef.current.pause();
+        }
+        audioRef.current = new Audio(url);
+        audioRef.current.play().catch(e => console.error("Audio playback failed:", e));
+    };
 
+    const sendMessage = async () => {
+        if (!input.trim() || typing) return;
+
+        const currentInput = input;
         const userMsg: Message = {
-            id: messages.length + 1,
+            id: Date.now(),
             sender: 'user',
-            text: input,
+            text: currentInput,
             timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         };
+
         setMessages(prev => [...prev, userMsg]);
         setInput('');
         setTyping(true);
 
-        setTimeout(() => {
+        try {
+            const response = await fetch(`${BACKEND_URL}/chat`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    message: currentInput,
+                    twin_id: 'default_twin', // Hardcoded for initial version
+                }),
+            });
+
+            if (!response.ok) throw new Error('Failed to fetch response');
+
+            const data = await response.json();
+
             const aiMsg: Message = {
-                id: messages.length + 2,
+                id: Date.now() + 1,
                 sender: 'ai',
-                text: aiResponses[Math.floor(Math.random() * aiResponses.length)],
+                text: data.reply,
                 timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
             };
+
             setMessages(prev => [...prev, aiMsg]);
+
+            if (data.audio_url) {
+                // Wait a bit before playing audio for natural feel
+                setTimeout(() => {
+                    playAudio(data.audio_url);
+                }, 500);
+            }
+        } catch (error) {
+            console.error('Chat error:', error);
+            const errorMsg: Message = {
+                id: Date.now() + 1,
+                sender: 'ai',
+                text: "Sorry, I'm having trouble connecting to my brain right now. Please check if the backend is running.",
+                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            };
+            setMessages(prev => [...prev, errorMsg]);
+        } finally {
             setTyping(false);
-        }, 1500 + Math.random() * 1500);
+        }
     };
 
     return (
