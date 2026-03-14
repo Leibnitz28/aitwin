@@ -122,7 +122,7 @@ export default function CreateTwinPage() {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    name: "Prince's Twin",
+                    name: "Piyush's Twin",
                     description: "Digital personality replica",
                     writing_samples: [writingText],
                 }),

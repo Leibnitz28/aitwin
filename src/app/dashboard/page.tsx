@@ -34,7 +34,7 @@ export default function DashboardPage() {
                             PT
                         </div>
                         <div className="flex-1">
-                            <h2 className="text-2xl font-bold text-white mb-1">Prince&apos;s EchoSoul</h2>
+                            <h2 className="text-2xl font-bold text-white mb-1">Piyush&apos;s EchoSoul</h2>
                             <p className="text-gray-400 mb-3">Created March 13, 2026 • Last active 2 minutes ago</p>
                             <div className="flex flex-wrap gap-2">
                                 <span className="px-3 py-1 rounded-full text-xs font-medium bg-emerald-400/10 text-emerald-400">

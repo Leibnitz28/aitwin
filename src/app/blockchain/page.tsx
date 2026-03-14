@@ -153,7 +153,7 @@ export default function BlockchainPage() {
                         </div>
                         <div className="space-y-3">
                             {[
-                                { label: 'Owner', value: 'Prince (piyush23)', verified: true },
+                                { label: 'Owner', value: 'Piyush (piyush23)', verified: true },
                                 { label: 'Minted', value: 'March 13, 2026', verified: true },
                                 { label: 'Contract', value: '0x1234...abcd', verified: true },
                             ].map((item, i) => (
