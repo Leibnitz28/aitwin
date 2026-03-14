@@ -263,9 +263,6 @@ export default function HeroBrain3D() {
                 {/* Bright central orb */}
                 <NeuralCore />
 
-                {/* Jagged white lightning paths extending from center */}
-                <MajorNeuralPathways />
-
                 {/* Brain-shaped plexus network */}
                 <BrainPlexusWeb />
 
