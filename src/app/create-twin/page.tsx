@@ -90,8 +90,6 @@ export default function CreateTwinPage() {
             if (res.ok) {
                 const data = await res.json();
                 setPersonalityScores(data.traits);
-                const elapsed = Date.now() - start;
-                if (elapsed < 3000) await new Promise(r => setTimeout(r, 3000 - elapsed));
                 setAnalysisComplete(true);
             }
         } catch { console.error('Analysis error'); } finally { setAnalyzing(false); }
@@ -116,7 +114,6 @@ export default function CreateTwinPage() {
             if (res.ok) {
                 const data = await res.json();
                 setTwinId(data.twin_id);
-                await new Promise(r => setTimeout(r, 2000));
                 setTwinGenerated(true);
             }
         } catch { console.error('Generation error'); } finally { setGenerating(false); }

@@ -23,8 +23,8 @@ function AnimatedCounter({ target, suffix = '' }: { target: number, suffix?: str
             setVal(Math.round(target * ease));
             if (prog < 1) requestAnimationFrame(animate);
         };
-        const timer = setTimeout(() => requestAnimationFrame(animate), 300);
-        return () => clearTimeout(timer);
+        requestAnimationFrame(animate);
+        return () => {};
     }, [target]);
     return <>{val}{suffix}</>;
 }

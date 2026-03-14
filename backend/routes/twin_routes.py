@@ -25,6 +25,7 @@ async def create_twin(payload: TwinCreate):
     """
     twin = TwinService.create_twin(
         user_id=payload.user_id,
+        name=payload.name,
         analysis=payload.analysis,
     )
     return twin

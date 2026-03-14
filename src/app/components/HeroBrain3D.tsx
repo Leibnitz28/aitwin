@@ -97,8 +97,9 @@ function MajorNeuralPathways() {
 // Background dark blue/cyan plexus network in the shape of a brain
 function BrainPlexusWeb() {
     const groupRef = useRef<THREE.Group>(null!);
+    const linesRef = useRef<THREE.LineSegments>(null!);
 
-    const { lines, points } = useMemo(() => {
+    const { geometry, points, posArray } = useMemo(() => {
         const nodes: THREE.Vector3[] = [];
         let attempts = 0;
         // Generate valid nodes inside the brain volume
@@ -114,31 +115,23 @@ function BrainPlexusWeb() {
             attempts++;
         }
 
-        const lineObjs: THREE.LineSegments[] = [];
+        const linePoints: THREE.Vector3[] = [];
         const maxDist = 0.5; // Connection threshold
 
         // Build straight-line connections (Plexus)
         for (let i = 0; i < nodes.length; i++) {
             let connections = 0;
             for (let j = i + 1; j < nodes.length; j++) {
-                if (connections > 6) break; // limit connections per node for aesthetics
+                if (connections > 6) break; 
                 const dist = nodes[i].distanceTo(nodes[j]);
                 if (dist < maxDist) {
-                    const geometry = new THREE.BufferGeometry().setFromPoints([nodes[i], nodes[j]]);
-                    const opacity = 1.0 - (dist / maxDist);
-                    // Mix of bright cyan and dark slate blue lines
-                    const color = Math.random() > 0.85 ? '#38bdf8' : '#0ea5e9'; 
-                    const material = new THREE.LineBasicMaterial({
-                        color: color, 
-                        transparent: true,
-                        opacity: opacity * 0.4,
-                        blending: THREE.AdditiveBlending,
-                    });
-                    lineObjs.push(new THREE.LineSegments(geometry, material));
+                    linePoints.push(nodes[i], nodes[j]);
                     connections++;
                 }
             }
         }
+        
+        const lineGeometry = new THREE.BufferGeometry().setFromPoints(linePoints);
         
         // Render the nodes as points
         const posArray = new Float32Array(nodes.length * 3);
@@ -157,26 +150,26 @@ function BrainPlexusWeb() {
             </points>
         );
 
-        return { lines: lineObjs, points: pointsObj };
+        return { geometry: lineGeometry, points: pointsObj, posArray };
     }, []);
 
     useFrame((state) => {
         const t = state.clock.elapsedTime;
         if (groupRef.current) groupRef.current.rotation.y = t * 0.05;
         
-        // Breathing effect on the plexus network
-        lines.forEach((line, i) => {
-            const mat = line.material as THREE.LineBasicMaterial;
-            mat.opacity = mat.opacity * 0.99 + (Math.sin(t * 0.5 + i) * 0.1 + 0.1) * 0.01;
-        });
+        // Pulsing opacity for the whole plexus instead of per-line loop to save CPU
+        if (linesRef.current) {
+            const mat = linesRef.current.material as THREE.LineBasicMaterial;
+            mat.opacity = 0.2 + (Math.sin(t * 0.5) * 0.1);
+        }
     });
 
     return (
         <group ref={groupRef}>
             {points}
-            {lines.map((obj, i) => (
-                <primitive key={i} object={obj} />
-            ))}
+            <lineSegments ref={linesRef} geometry={geometry}>
+                <lineBasicMaterial color="#0ea5e9" transparent opacity={0.2} blending={THREE.AdditiveBlending} />
+            </lineSegments>
         </group>
     );
 }

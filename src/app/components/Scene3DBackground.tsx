@@ -39,25 +39,25 @@ function ParticleField() {
 }
 
 function FloatingConnections() {
-    const linesRef = useRef<THREE.Group>(null!);
+    const linesRef = useRef<THREE.LineSegments>(null!);
 
-    const lines = useMemo(() => {
-        const lineData: { start: THREE.Vector3; end: THREE.Vector3 }[] = [];
+    const geometry = useMemo(() => {
+        const points: THREE.Vector3[] = [];
         for (let i = 0; i < 30; i++) {
-            lineData.push({
-                start: new THREE.Vector3(
+            points.push(
+                new THREE.Vector3(
                     (Math.random() - 0.5) * 12,
                     (Math.random() - 0.5) * 12,
                     (Math.random() - 0.5) * 12
                 ),
-                end: new THREE.Vector3(
+                new THREE.Vector3(
                     (Math.random() - 0.5) * 12,
                     (Math.random() - 0.5) * 12,
                     (Math.random() - 0.5) * 12
-                ),
-            });
+                )
+            );
         }
-        return lineData;
+        return new THREE.BufferGeometry().setFromPoints(points);
     }, []);
 
     useFrame((state) => {
@@ -67,17 +67,9 @@ function FloatingConnections() {
     });
 
     return (
-        <group ref={linesRef}>
-            {lines.map((line, i) => {
-                const geometry = new THREE.BufferGeometry().setFromPoints([line.start, line.end]);
-                return (
-                    <primitive
-                        key={i}
-                        object={new THREE.Line(geometry, new THREE.LineBasicMaterial({ color: '#0ea5e9', transparent: true, opacity: 0.08 }))}
-                    />
-                );
-            })}
-        </group>
+        <lineSegments ref={linesRef} geometry={geometry}>
+            <lineBasicMaterial color="#0ea5e9" transparent opacity={0.08} />
+        </lineSegments>
     );
 }
 

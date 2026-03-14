@@ -127,7 +127,7 @@ function ChatContent() {
                 timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
             };
             setMessages(prev => [...prev, aiMsg]);
-            if (data.audio_url) setTimeout(() => playAudio(data.audio_url), 500);
+            if (data.audio_url) playAudio(data.audio_url);
         } catch {
             setMessages(prev => [...prev, {
                 id: Date.now() + 1,
