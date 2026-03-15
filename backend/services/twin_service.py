@@ -82,11 +82,11 @@ class TwinService:
 
         # 3. Fallback for development — seed default twin
         if twin_id == 'default_twin':
+            from models.schemas import PersonalityTraits  # type: ignore
             analysis = AnalysisResult(
-                traits={"openness": 88, "conscientiousness": 75, "extraversion": 60, "agreeableness": 82, "neuroticism": 35},
+                traits=PersonalityTraits(openness=88, conscientiousness=75, extraversion=60, agreeableness=82, neuroticism=35),
                 overall_match=94.5,
-                communication_style="Creative, thoughtful, and analytical.",
-                warnings=[]
+                summary="Creative, thoughtful, and analytical.",
             )
             twin = cls.create_twin(user_id="default_user", name="General Assistant", analysis=analysis)
             cls._twins.pop(twin.twin_id)
@@ -96,6 +96,22 @@ class TwinService:
             return twin
 
         return None
+
+    @classmethod
+    def delete_twin(cls, twin_id: str) -> bool:
+        """Delete a twin from memory and ChromaDB."""
+        twin = cls._twins.pop(twin_id, None)
+        
+        # Remove from user mapping if it was the active twin
+        if twin and cls._user_to_twin.get(twin.user_id) == twin_id:
+            del cls._user_to_twin[twin.user_id]
+            
+        # Delete from ChromaDB
+        vdb = cls._vdb()
+        if vdb:
+            vdb.delete_twin(twin_id)
+            
+        return twin is not None
 
     @classmethod
     def set_avatar_url(cls, twin_id: str, avatar_url: str):

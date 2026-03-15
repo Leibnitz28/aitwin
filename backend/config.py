@@ -15,14 +15,19 @@ class Config:
     SECRET_KEY: str = os.getenv("SECRET_KEY", "dev-secret-key")
     FRONTEND_URL: str = os.getenv("FRONTEND_URL", "http://localhost:3000")
 
-    # ── ElevenLabs (Voice Cloning & TTS) ──────────────────────────────────────
-    ELEVENLABS_API_KEY: str = os.getenv("ELEVENLABS_API_KEY", "")
-    ELEVENLABS_VOICE_ID: str = os.getenv("ELEVENLABS_VOICE_ID", "")
-    ELEVENLABS_BASE_URL: str = "https://api.elevenlabs.io/v1"
+    OPENAI_MODEL: str = os.getenv("OPENAI_MODEL", "gpt-4-turbo-preview")
+
+    # Feature Flags
+    ENABLE_AGENT_ORCHESTRATOR: bool = True
 
     # ── AI Services ───────────────────────────────────────────────────────────
     OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "")
     GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")
+
+    # ── ElevenLabs (Voice Cloning & TTS) ─────────────────────────────────────
+    ELEVENLABS_API_KEY: str = os.getenv("ELEVENLABS_API_KEY", "")
+    ELEVENLABS_VOICE_ID: str = os.getenv("ELEVENLABS_VOICE_ID", "")
+    ELEVENLABS_BASE_URL: str = "https://api.elevenlabs.io/v1"
 
     # ── Ethereum / Blockchain ─────────────────────────────────────────────────
     ETH_RPC_URL: str = os.getenv("ETH_RPC_URL", "")
@@ -58,6 +63,15 @@ class Config:
     @classmethod
     def has_elevenlabs(cls) -> bool:
         return bool(cls.ELEVENLABS_API_KEY)
+
+    @classmethod
+    def get_llm_provider(cls) -> str:
+        """Returns the configured LLM provider (openai or gemini)."""
+        if cls.has_openai():
+            return "openai"
+        elif cls.has_gemini():
+            return "gemini"
+        return "none"
 
     @classmethod
     def has_blockchain(cls) -> bool:

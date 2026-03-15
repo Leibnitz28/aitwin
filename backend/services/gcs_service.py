@@ -48,7 +48,7 @@ class GCSService:
     ) -> str:
         """
         Upload a file to GCS.
-        Returns the public URL or a mock URL if GCS is unavailable.
+        Falls back to local storage if GCS is unavailable.
         """
         if cls._init() and cls._bucket:
             try:
@@ -59,8 +59,13 @@ class GCSService:
             except Exception as e:
                 print(f"⚠️ GCS upload error: {e}")
 
-        # Mock URL for development
-        return f"https://storage.googleapis.com/echosoul-audio/audio/{filename}"
+        # Fallback: save locally to uploads/audio/ and serve via static files
+        from pathlib import Path
+        audio_dir = Path(__file__).parent.parent / "uploads" / "audio"
+        audio_dir.mkdir(parents=True, exist_ok=True)
+        local_path = audio_dir / filename
+        local_path.write_bytes(file_bytes)
+        return f"http://localhost:8000/uploads/audio/{filename}"
 
     @classmethod
     async def upload_voice_sample(cls, file_bytes: bytes, user_id: str) -> str:

@@ -8,21 +8,28 @@ Snowflake analytics, and Google Cloud Storage.
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
-from routes import chat_routes, twin_routes, voice_routes, blockchain_routes, analytics_routes
+from routes import chat_routes, twin_routes, voice_routes, blockchain_routes, analytics_routes, ingest_routes
+from routes import voice_chat_routes
 from fastapi.staticfiles import StaticFiles
 from pathlib import Path
 from config import Config
 import uvicorn
 
-# ── Lifespan (startup/shutdown) ───────────────────────────────────────────
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup: Initialize ChromaDB
+    # Startup: Initialize ChromaDB and Local Voice Model
     try:
         from services.vectordb_service import VectorDBService
         VectorDBService.init()
     except Exception as e:
         print(f"⚠️ ChromaDB startup skipped: {e}")
+        
+    try:
+        from services.local_voice_service import LocalVoiceService
+        LocalVoiceService.init()
+    except Exception as e:
+        print(f"⚠️ LocalVoiceService startup failed: {e}")
+        
     yield
     # Shutdown: nothing to clean up
 
@@ -34,7 +41,7 @@ app = FastAPI(
         "AI Personality Twin platform backend.\n\n"
         "**Features:**\n"
         "- 🧠 5-agent AI orchestration pipeline\n"
-        "- 🔊 ElevenLabs voice cloning & TTS\n"
+        "- 🔊 Local XTTS-v2 voice cloning & TTS\n"
         "- ⛓️ Ethereum NFT identity minting (web3.py)\n"
         "- ❄️ Snowflake analytics & conversation logging\n"
         "- ☁️ Google Cloud Storage for audio files\n"
@@ -66,6 +73,8 @@ app.include_router(twin_routes.router,       tags=["🤖 Twins"])
 app.include_router(voice_routes.router,      tags=["🔊 Voice"])
 app.include_router(blockchain_routes.router, tags=["⛓️ Blockchain"])
 app.include_router(analytics_routes.router,  tags=["📊 Analytics"])
+app.include_router(ingest_routes.router,     tags=["📥 Data Ingestion"])
+app.include_router(voice_chat_routes.router, tags=["🎧 Voice Chat"])
 
 
 # ── Health check ──────────────────────────────────────────────────────────────
@@ -86,7 +95,7 @@ async def root():
         "integrations": {
             "gemini": Config.has_gemini(),
             "openai": Config.has_openai(),
-            "elevenlabs": Config.has_elevenlabs(),
+            "local_voice": True,
             "blockchain": Config.has_blockchain(),
             "snowflake": Config.has_snowflake(),
             "gcs": Config.has_gcs(),

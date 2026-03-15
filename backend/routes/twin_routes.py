@@ -9,7 +9,7 @@ from models.schemas import (
 )
 from services.analysis_service import PersonalityAnalysisService
 from services.twin_service import TwinService
-from services.elevenlabs_service import ElevenLabsService
+from services.local_voice_service import LocalVoiceService
 from services.storage_service import StorageService
 from services.avatar3d_service import Avatar3DService
 from utils.helpers import sanitize_text
@@ -130,16 +130,12 @@ async def upload_voice(
 ):
     """
     Accept a voice audio file upload (.mp3, .wav, .m4a).
-    Stores the file in GCS and optionally clones the voice via ElevenLabs.
+    Stores the file in GCS and clones the voice locally using XTTS-v2.
     """
-    allowed_types = {
-        "audio/mpeg", "audio/wav", "audio/x-wav",
-        "audio/mp4", "audio/m4a", "audio/aac",
-    }
-    if file.content_type and file.content_type not in allowed_types:
+    if file.content_type and not file.content_type.startswith("audio/"):
         raise HTTPException(
             status_code=400,
-            detail=f"Unsupported file type: {file.content_type}. Use .mp3, .wav, or .m4a",
+            detail=f"Unsupported file type: {file.content_type}. Please upload an audio file.",
         )
 
     contents = await file.read()
@@ -148,8 +144,9 @@ async def upload_voice(
     # Upload to Local Storage
     storage_url = await StorageService.upload_voice_sample(contents, user_id)
 
-    # Attempt voice cloning via ElevenLabs
-    voice_id = await ElevenLabsService.clone_voice(contents, f"twin_{user_id}")
+    # Voice cloning via Local XTTS-v2
+    voice_id = await LocalVoiceService.clone_voice(contents, f"twin_{user_id}")
+    clone_success = voice_id is not None
 
     # If user already has a twin, attach voice_id
     if voice_id:
@@ -163,7 +160,7 @@ async def upload_voice(
         "filename": file.filename,
         "size_kb": size_kb,
         "storage_url": storage_url,
-        "voice_cloned": voice_id is not None,
+        "voice_cloned": clone_success,
         "voice_id": voice_id,
     }
 
@@ -196,6 +193,17 @@ async def get_twin(twin_id: str):
     if not twin:
         raise HTTPException(status_code=404, detail="Twin not found")
     return twin
+
+@router.delete("/twins/{twin_id}", summary="Delete an AI twin")
+async def delete_twin(twin_id: str):
+    """
+    Deletes a twin and all associated data from the platform.
+    """
+    success = TwinService.delete_twin(twin_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="Twin not found")
+        
+    return {"message": "Twin deleted successfully", "twin_id": twin_id}
 
 
 @router.get("/search", summary="Semantic search for twins and conversations")

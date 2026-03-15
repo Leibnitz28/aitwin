@@ -201,29 +201,55 @@ class AgentOrchestrator:
     async def _generate_reply(cls, context: dict) -> str:
         """Generate a personality-matched response based on the pipeline context."""
         client = cls._init_client()
-        
+
         prefix = context.get("prefix", "")
         message = context.get("message", "")
         tone = context.get("tone", "")
         dominant = context.get("dominant_trait", "openness")
         memory = context.get("memory_context", [])
         personality = context.get("personality", {})
+        twin_id = context.get("twin_id", "")
+        user_id = context.get("user_id", "")
+
+        # Build conversation history string
+        memory_str = "\n".join([f"User: {m['user']}\nAI: {m['ai']}" for m in memory])
+
+        # ── Fetch user knowledge from ChromaDB (web + social + writing) ──────
+        knowledge_context = ""
+        if user_id:
+            try:
+                from services.vectordb_service import VectorDBService  # type: ignore
+                if VectorDBService.is_ready():
+                    knowledge_context = VectorDBService.get_user_knowledge(
+                        user_id=user_id, query=message, n_results=4
+                    )
+            except Exception as e:
+                print(f"⚠️ Knowledge fetch error: {e}")
+
+        knowledge_section = (
+            f"\n\n## Knowledge Base (use this to answer accurately):\n{knowledge_context}"
+            if knowledge_context
+            else ""
+        )
+
+        system_prompt = f"""You are an AI digital twin — a living, breathing replica of a real human being.
+
+## Your Personality Profile:
+- Big Five Traits: {json.dumps(personality)}
+- Dominant Trait: {dominant}
+- Target Communication Tone: {tone}
+
+## Your Task:
+Respond EXACTLY as this person would — using their actual writing style, opinions, knowledge, vocabulary, and emotional register.
+Use the prefix naturally if it fits: "{prefix}"
+Be specific, personal, and authentic. Never say "as an AI" — you ARE this person.
+{knowledge_section}
+
+## Recent Conversation History:
+{memory_str}
+"""
 
         if client:
-            # Build context String
-            memory_str = "\n".join([f"User: {m['user']}\nAI: {m['ai']}" for m in memory])
-            system_prompt = f"""You are an AI digital twin with the following personality profile:
-            - Traits: {json.dumps(personality)}
-            - Dominant Trait: {dominant}
-            - Target Tone: {tone}
-            
-            You should respond as if you are the user's digital replica. 
-            Use the target tone and incorporate the following prefix in your response if it fits naturally: "{prefix}"
-            
-            Previous Conversation:
-            {memory_str}
-            """
-
             if client == "gemini":
                 try:
                     import google.generativeai as genai  # type: ignore
@@ -232,24 +258,22 @@ class AgentOrchestrator:
                     return response.text.strip()
                 except Exception as e:
                     print(f"⚠️ Gemini generation error: {e}")
-                    # Fall through to OpenAI if config exists, else mock
             else:
                 try:
                     response = await client.chat.completions.create(
-                        model="gpt-3.5-turbo",
+                        model="gpt-4-turbo-preview",
                         messages=[
                             {"role": "system", "content": system_prompt},
                             {"role": "user", "content": message}
                         ],
-                        max_tokens=250,
-                        temperature=0.7,
+                        max_tokens=350,
+                        temperature=0.75,
                     )
                     return response.choices[0].message.content.strip()
                 except Exception as e:
                     print(f"⚠️ OpenAI generation error: {e}")
-                    # Fall through to mock logic
 
-        # ── Mock Logic (Fallback) ─────────────────────────────────────────────
+        # ── Mock Logic (Fallback when no AI configured) ──────────────────────
         parts = [prefix]
         words = message.strip().split()
         if len(words) > 3:

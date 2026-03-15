@@ -1,71 +1,115 @@
-# EchoSoul: AI Personality Replicator
+# 🧬 EchoSoul: AI Personality Twin Platform
 
-An intelligent, multi-agent platform designed to replicate and interact with a user's digital personality twin using advanced AI, voice cloning, and blockchain technology.
-
-## 🌟 Advancements Till Now (Current Architecture)
-
-The project has completely evolved from its original Node.js/MongoDB structure into a robust, modern AI application stack. 
-
-### 🖥️ Frontend (Next.js)
-- **Tech Stack**: Next.js 16 (React 19), TailwindCSS V4, Framer Motion, Three.js (@react-three/fiber).
-- **Features**: 
-  - Complete, responsive modern dark UI with dynamic routing.
-  - Implemented core pages: Home, Create Twin, Dashboard, Chat Interface, Voice Studio, Blockchain Verifier, and Analytics.
-  - Interactive onboarding flow to upload writing and voice samples.
-
-### ⚙️ Backend (FastAPI / Python)
-- **Tech Stack**: FastAPI, Uvicorn, Python 3.
-- **AI Orchestration**: Built a 5-agent pipeline (`agent_orchestrator.py`) utilizing OpenAI / Gemini to extract and analyze personality traits (Big Five).
-- **Voice Synthesis**: Successfully integrated **ElevenLabs** API for both voice cloning (from uploaded `.mp3`/`.wav` samples) and real-time Text-To-Speech generation.
-- **Analytics Integration**: Integrated **Snowflake** via `snowflake-connector-python` to securely log chat history and pull advanced platform metrics.
-- **Blockchain Identity**: Configured `web3.py` for minting Digital Twin identities onto the Ethereum Blockchain (Sepolia Testnet), assigning them unique NFTs.
-- **Storage Subsystem**: Transitioned away from Google Cloud Storage to a rapid **Local File Storage** (`StorageService`), meaning audio files and TTS generations are securely saved and served directly from the backend (`/uploads` directory) without requiring cloud keys.
+An intelligent, multi-agent platform designed to replicate and interact with a digital personality twin. Built with Next.js, FastAPI, ChromaDB, and cutting-edge GenAI APIs, EchoSoul constructs an AI version of you using data from your web footprint, social media, writing samples, and real-time voice cloning.
 
 ---
 
-## 🚀 What Work is Remaining?
+## 🌟 Key Features
 
-While the core functionality is active, the following segments require completion or polishing to reach a fully production-ready state:
+### 🖥️ Frontend (Next.js 16)
+- **Tech Stack**: Next.js 16 (React 19), TailwindCSS v4, Framer Motion, Lucide React.
+- **Glassmorphic UI**: Complete, responsive modern dark UI with dynamic animated routes.
+- **Twin Creation Flow**: Interactive multi-step onboarding to upload writing and voice samples.
+- **Data Ingestion Hub**: Paste URLs to trigger the web scraper, pull Reddit/GitHub/Twitter social data, upload voice clones, or paste writing samples.
+- **Immersive Chat**: Hold-to-record voice interactions with live Audio Playback, animated typing indicators, and a dropdown visualization of the internal AI agent pipeline step execution.
 
-### 1. Smart Contract & Blockchain Hardening
-- **Deploy Smart Contract**: The Ethereum Contract Address is currently unassigned in the `.env` file. We need to deploy the actual Solidity ERC-721/ERC-1155 contract to Sepolia, verify it, and link the address.
-- **Frontend Web3 Integration**: Ensure users can connect their Web3 wallets (e.g., MetaMask) on the frontend to natively sign transactions and view their Twin NFT.
-
-### 2. Analytics Expansion
-- **Real-Time Data Sync**: While Snowflake logs are functional, the API currently utilizes a mock fallback for detailed charts (like accuracy scores and active users). We need to write the specific advanced SQL queries in `snowflake_service.py` to populate these charts dynamically.
-
-### 3. Authentication & Security
-- **User Accounts**: Currently, `user_id` generation is largely mocked/session-based. We need to implement a true authentication system (like NextAuth, Clerk, or JWT backend issuing) to secure user twins.
-- **API Rate Limiting**: Implement connection throttling on the FastAPI endpoints so that malicious users cannot drain ElevenLabs or OpenAI quotas.
-
-### 4. System Resiliency & Error Handling
-- **Graceful Degradations**: Add user-friendly UI toasts/modals to handle scenarios where an external API (like ElevenLabs or OpenAI) times out or runs out of credits.
-- **Job Queues**: Transition long-running AI analysis and voice-cloning tasks to asynchronous background workers (like Celery or Redis Queue) to prevent HTTP timeouts.
-
-### 5. Deployment & DevOps
-- **Dockerization**: Create `Dockerfile`s and a `docker-compose.yml` that cleanly packages both the Next.js frontend and the FastAPI backend.
-- **Production CDN**: Transition the local `StorageService` to an AWS S3/CloudFront or alternative architecture if scaling beyond a single local server is desired for production.
+### ⚙️ Backend (FastAPI + AI Agents)
+- **Vector Database**: **ChromaDB** maintains specialized collections for `web_content` (chunked web sites), `social_content` (chunked tweets & repos), and `writing_samples`.
+- **Personality Analysis Engine**: Dynamic agent pipeline using Gemini 1.5 Flash (or OpenAI GPT-4) to extract and calculate Big Five personality traits based on ingested user data.
+- **Voice Synthesis (ElevenLabs)**: Implements **ElevenLabs** API for ultra-realistic voice cloning from uploaded `.mp3`/`.webm` samples and real-time Text-To-Speech generation. (Falls back to OpenVoice on API disruption).
+- **Web & Social Web Scraping**: Ingests public URLs (via BeautifulSoup4) and Twitter/Reddit data natively.
+- **Analytics & Blockchain Integration**: Uses Snowflake connector for user metric logging and Web3.py for native minting of Digital Twin identities onto the Ethereum Blockchain.
 
 ---
 
-## 💻 Quick Start (Current Setup)
+## 💻 Tech Stack Overview
+**Frontend**: Next.js, React, Tailwind CSS, Framer Motion  
+**Backend**: FastAPI, Pydantic, Uvicorn, Python 3  
+**Database**: ChromaDB (Vector Search), Snowflake (Analytics)  
+**AI Models/APIs**: Gemini 1.5 Flash, OpenAI GPT-4/3.5, ElevenLabs, Whisper  
 
-### 1. Frontend
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Node.js (v18+)
+- Python (v3.10+)
+- LLM API Keys (Gemini or OpenAI)
+- ElevenLabs API Key (for Voice Cloning)
+
+### 1. Frontend Setup
+Open a terminal in the root directory:
 ```bash
-cd "Twin AI"
+cd frontend
+
+# Install Node dependencies
 npm install
+
+# Start the Next.js development server
 npm run dev
 ```
 *Frontend runs on `http://localhost:3000`*
 
-### 2. Backend
+### 2. Backend Setup
+Open a **new** terminal window and navigate to the backend directory:
 ```bash
-cd "Twin AI/backend"
-# Activate your virtual environment
-.\venv\Scripts\activate  # Windows
-# or source venv/bin/activate # Mac/Linux
+cd backend
 
+# Create a virtual environment
+python -m venv .venv
+
+# Activate it
+# Windows:
+.\.venv\Scripts\activate
+# Mac/Linux:
+# source .venv/bin/activate
+
+# Install the dependencies
 pip install -r requirements.txt
-python main.py
+
+# Start the FastAPI server
+python -m uvicorn main:app --reload --port 8000
 ```
-*Backend runs on `http://localhost:8000` (Swagger Docs at `/docs`)*
+*Backend runs on `http://localhost:8000`*
+
+### 3. Environment Variables
+Create a `.env` file inside the `/backend` folder. **(Note: This file is git-ignored for safety)**
+
+```env
+# /backend/.env
+
+# --- AI APIs ---
+# Provide either Gemini or OpenAI (or both)
+GEMINI_API_KEY="AIzaSyYourGeminiKeyHere..."
+OPENAI_API_KEY="sk-proj-YourOpenAIKeyHere..."
+
+# --- Voice Synthesis ---
+ELEVENLABS_API_KEY="sk_YourElevenLabsKey..."
+ELEVENLABS_VOICE_ID="YourCustomVoiceID..." # Leave blank if you haven't created one yet
+```
+
+---
+
+## 📁 Repository Structure
+```
+├── frontend/           # Next.js App
+│   ├── src/app/        # App Router pages (chat, ingest, dashboard, etc.)
+│   ├── src/components/ # Reusable React components
+│   └── package.json    # Frontend dependencies
+├── backend/            # FastAPI Python App
+│   ├── main.py         # Entry point
+│   ├── config.py       # Configuration & Env Loading
+│   ├── routes/         # API Routers (chat, ingest, voice, etc.)
+│   ├── services/       # Core business logic (Agents, ChromaDB, Scraping)
+│   ├── uploads/        # Local persistent file storage
+│   └── chroma_data/    # ChromaDB persistent storage (git-ignored)
+└── README.md           # Documentation
+```
+
+---
+
+## 📌 Contributing & Future Features
+- **Blockchain Hardening**: Finalize Ethereum NFT logic to fully mint User Twin objects exclusively on the ETH Blockchain.
+- **True Auth Integration**: Integrate NextAuth / Clerk to establish persistent user_id connections for multi-tenant support.
+- **Dockerization**: Create a unified `docker-compose.yml` configuration to orchestrate ChromaDB, FastAPI, and Next.js instantly in any environment. 

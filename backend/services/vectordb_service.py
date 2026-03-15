@@ -19,6 +19,8 @@ class VectorDBService:
     _conversations_col: Any = None
     _users_col: Any = None
     _writing_col: Any = None
+    _web_col: Any = None
+    _social_col: Any = None
 
     # ── Initialization ────────────────────────────────────────────────────────
 
@@ -53,12 +55,22 @@ class VectorDBService:
                 name="writing_samples",
                 metadata={"description": "Writing samples with personality embeddings"},
             )
+            cls._web_col = cls._client.get_or_create_collection(
+                name="web_content",
+                metadata={"description": "Scraped web page content"},
+            )
+            cls._social_col = cls._client.get_or_create_collection(
+                name="social_content",
+                metadata={"description": "Social media posts and profiles"},
+            )
 
             print(f"✅ ChromaDB initialized at {persist_dir}")
             print(f"   Collections: twins({cls._twins_col.count()}), "
                   f"conversations({cls._conversations_col.count()}), "
                   f"users({cls._users_col.count()}), "
-                  f"writing_samples({cls._writing_col.count()})")
+                  f"writing_samples({cls._writing_col.count()}), "
+                  f"web({cls._web_col.count()}), "
+                  f"social({cls._social_col.count()})")
 
         except Exception as e:
             print(f"⚠️ ChromaDB init failed: {e}")
@@ -75,6 +87,7 @@ class VectorDBService:
     @classmethod
     def upsert_twin(cls, twin_id: str, user_id: str, name: str,
                     analysis: dict, voice_id: str = "",
+                    avatar_url: str = "",
                     blockchain_tx: str = "", conversation_count: int = 0,
                     created_at: str = "") -> bool:
         """Store or update a twin profile in the vector DB."""
@@ -96,6 +109,7 @@ class VectorDBService:
                 "name": name,
                 "analysis_json": json.dumps(analysis),
                 "voice_id": voice_id or "",
+                "avatar_url": avatar_url or "",
                 "blockchain_tx": blockchain_tx or "",
                 "conversation_count": conversation_count,
                 "created_at": created_at or datetime.utcnow().isoformat(),
@@ -145,6 +159,19 @@ class VectorDBService:
         except Exception:
             pass
         return None
+
+    @classmethod
+    def delete_twin(cls, twin_id: str) -> bool:
+        """Delete a twin from the vector DB."""
+        if not cls.is_ready():
+            return False
+            
+        try:
+            cls._twins_col.delete(ids=[twin_id])
+            return True
+        except Exception as e:
+            print(f"⚠️ VectorDB delete error: {e}")
+            return False
 
     @classmethod
     def list_twins(cls) -> List[dict]:
@@ -392,3 +419,188 @@ class VectorDBService:
             return samples
         except Exception:
             return []
+
+    # ═══════════════════════════════════════════════════════════════════════════
+    # WEB CONTENT COLLECTION
+    # ═══════════════════════════════════════════════════════════════════════════
+
+    @classmethod
+    def add_web_content(cls, user_id: str, url: str, title: str,
+                        text: str, chunk_index: int = 0) -> bool:
+        """Store a chunk of scraped web page content."""
+        if not cls.is_ready() or cls._web_col is None:
+            return False
+        doc_id = f"{user_id}_web_{hash(url)}_{chunk_index}"
+        try:
+            cls._web_col.upsert(
+                ids=[doc_id],
+                documents=[text],
+                metadatas=[{
+                    "user_id": user_id,
+                    "url": url,
+                    "title": title,
+                    "chunk_index": chunk_index,
+                    "timestamp": datetime.utcnow().isoformat(),
+                }],
+            )
+            return True
+        except Exception as e:
+            print(f"⚠️ add_web_content error: {e}")
+            return False
+
+    @classmethod
+    def search_web_content(cls, user_id: str, query: str, n_results: int = 5) -> List[dict]:
+        """Semantic search over scraped web content for a user."""
+        if not cls.is_ready() or cls._web_col is None:
+            return []
+        try:
+            result = cls._web_col.query(
+                query_texts=[query],
+                n_results=n_results,
+                where={"user_id": user_id},
+                include=["documents", "metadatas", "distances"],
+            )
+            items = []
+            if result and result["ids"] and result["ids"][0]:
+                for i in range(len(result["ids"][0])):
+                    meta = result["metadatas"][0][i]
+                    items.append({
+                        "text": result["documents"][0][i][:400],
+                        "url": meta.get("url", ""),
+                        "title": meta.get("title", ""),
+                        "relevance": round(1 - result["distances"][0][i], 3),  # type: ignore
+                    })
+            return items
+        except Exception:
+            return []
+
+    # ═══════════════════════════════════════════════════════════════════════════
+    # SOCIAL CONTENT COLLECTION
+    # ═══════════════════════════════════════════════════════════════════════════
+
+    @classmethod
+    def add_social_content(cls, user_id: str, platform: str, handle: str,
+                           text: str, chunk_index: int = 0) -> bool:
+        """Store a chunk of social media content."""
+        if not cls.is_ready() or cls._social_col is None:
+            return False
+        doc_id = f"{user_id}_{platform}_{hash(text)}_{chunk_index}"
+        try:
+            cls._social_col.upsert(
+                ids=[doc_id],
+                documents=[text],
+                metadatas=[{
+                    "user_id": user_id,
+                    "platform": platform,
+                    "handle": handle,
+                    "chunk_index": chunk_index,
+                    "timestamp": datetime.utcnow().isoformat(),
+                }],
+            )
+            return True
+        except Exception as e:
+            print(f"⚠️ add_social_content error: {e}")
+            return False
+
+    @classmethod
+    def search_social_content(cls, user_id: str, query: str, n_results: int = 5) -> List[dict]:
+        """Semantic search over social media content for a user."""
+        if not cls.is_ready() or cls._social_col is None:
+            return []
+        try:
+            result = cls._social_col.query(
+                query_texts=[query],
+                n_results=n_results,
+                where={"user_id": user_id},
+                include=["documents", "metadatas", "distances"],
+            )
+            items = []
+            if result and result["ids"] and result["ids"][0]:
+                for i in range(len(result["ids"][0])):
+                    meta = result["metadatas"][0][i]
+                    items.append({
+                        "text": result["documents"][0][i][:400],
+                        "platform": meta.get("platform", ""),
+                        "handle": meta.get("handle", ""),
+                        "relevance": round(1 - result["distances"][0][i], 3),  # type: ignore
+                    })
+            return items
+        except Exception:
+            return []
+
+    # ═══════════════════════════════════════════════════════════════════════════
+    # CROSS-COLLECTION HELPERS
+    # ═══════════════════════════════════════════════════════════════════════════
+
+    @classmethod
+    def get_user_knowledge(cls, user_id: str, query: str, n_results: int = 4) -> str:
+        """
+        Retrieve the most relevant knowledge about a user from all sources —
+        writing samples, web content, and social media.
+        Returns a formatted string for injection into the agent's system prompt.
+        """
+        sections = []
+
+        # Writing samples
+        try:
+            writings = cls._writing_col.query(
+                query_texts=[query],
+                n_results=n_results,
+                where={"user_id": user_id},
+                include=["documents"],
+            )
+            if writings and writings["ids"] and writings["ids"][0]:
+                excerpts = [writings["documents"][0][i][:300] for i in range(len(writings["ids"][0]))]
+                if excerpts:
+                    sections.append("## Writing Samples\n" + "\n---\n".join(excerpts))
+        except Exception:
+            pass
+
+        # Web content
+        web = cls.search_web_content(user_id=user_id, query=query, n_results=n_results)
+        if web:
+            web_texts = [f"[{w['title']}]: {w['text']}" for w in web]
+            sections.append("## Web / Article Knowledge\n" + "\n---\n".join(web_texts))
+
+        # Social media
+        social = cls.search_social_content(user_id=user_id, query=query, n_results=n_results)
+        if social:
+            social_texts = [f"[{s['platform']} @{s['handle']}]: {s['text']}" for s in social]
+            sections.append("## Social Media Posts\n" + "\n---\n".join(social_texts))
+
+        if not sections:
+            return ""
+        return "\n\n".join(sections)
+
+    @classmethod
+    def get_document_counts(cls, user_id: str) -> dict:
+        """Return how many documents each source has for a given user."""
+        counts = {"writing": 0, "web": 0, "social": 0, "conversations": 0}
+        if not cls.is_ready():
+            return counts
+        try:
+            if cls._writing_col:
+                r = cls._writing_col.get(where={"user_id": user_id}, include=[])
+                counts["writing"] = len(r.get("ids", []))
+        except Exception:
+            pass
+        try:
+            if cls._web_col:
+                r = cls._web_col.get(where={"user_id": user_id}, include=[])
+                counts["web"] = len(r.get("ids", []))
+        except Exception:
+            pass
+        try:
+            if cls._social_col:
+                r = cls._social_col.get(where={"user_id": user_id}, include=[])
+                counts["social"] = len(r.get("ids", []))
+        except Exception:
+            pass
+        try:
+            if cls._conversations_col:
+                r = cls._conversations_col.get(include=[])
+                counts["conversations"] = len(r.get("ids", []))
+        except Exception:
+            pass
+        return counts
+
